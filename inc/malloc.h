@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 19:17:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/02 17:36:19 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/02 19:24:11 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # define HINT_SMALL_SIZE	1024
 # define BONUS				0
 
-struct						s_ma_page;
+struct s_ma_page;
 
 typedef struct				s_ma_header
 {
