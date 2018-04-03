@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 19:17:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/03 11:56:56 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/03 12:56:23 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,13 @@
 # pragma pack(push, 1)
 
 /*
-** size and previous does not include guard or header
-*/
-
-/*
 ** sizeof(t_ma_header_small_tiny) == 4
+** size: size of the bloc following this header
+** previous: position of the previous bloc, relative to this header
+** flags: bitwise flag, used to tell if memory is allocated
+**   0b01: free
+**   0b10: unused
+** size and previous does not include guard or header
 */
 
 typedef struct				s_ma_header_small_tiny
@@ -57,6 +59,14 @@ typedef struct				s_ma_header_small_tiny
 
 /*
 ** sizeof(t_ma_page) == 32 / 16
+** size: the total size of the page, including this header
+** last_block: position (relative to this header) of the last bloc in the page
+** flags: bitwise flag for type and status
+**   0b01: large page
+**   0b10: free page (no bloc/only free blocs)
+** previous: pointer to another page, or NULL if this page is the first of the
+**   chain
+** next: pointer to another page, or NULL if this page is the last of the chain
 */
 
 # if __SIZEOF_POINTER__ == 8
@@ -89,9 +99,27 @@ struct						s_ma_page_32
 #  error "Invalid pointer size"
 # endif
 
+typedef S_MA_PAGE			t_ma_page;
+
 # pragma pack(pop)
 
-typedef S_MA_PAGE			t_ma_page;
+/*
+** UNINITIALIZED: default state
+** INITIALIZED: prevent reinitialisation
+** SCRIBBLE: signal to free to scribble over the unallocated memory with the
+**   character g_ma_handler.scribble set by the env 'MALLOC_SCRIBBLE='
+** GUARD_EDGES: signal to alloc functions to add (g_ma_handler.guard_edges)
+**   bytes around allocated memory. g_ma_handler.guard_edges is set by the env
+**   'MALLOC_GUARD_EDGES='
+** all following values are flags set by the env prefixing them with 'MALLOC_'
+** example: to set ALLOC_LOG, add to env the entry 'MALLOC_ALLOC_LOG'
+** ALLOC_LOG: print information on calls to alloc functions
+** FREE_LOG: print information on calls to free
+** HEXDUMP: extend the output format of 'show_alloc_mem'
+** FRAGMENTED: disable defragmentation of freed memory, for testing purpose
+** FINAL_FREE: call free on all allocated memory on program exit
+** NO_FREE: disable entirely the calls to free, for testing purpose
+*/
 
 typedef enum				e_mah_flags
 {
@@ -106,6 +134,22 @@ typedef enum				e_mah_flags
 	FINAL_FREE = 128,
 	NO_FREE = 256
 }							t_mah_flags;
+
+/*
+** flags: see t_mah_flags definition above, default SCRIBBLE
+** tiny_size: maximum size of a tiny bloc (not including header and guards)
+** tiny_zone: size of allocated zones (including header and guards, zones can
+**   contain up to 128 bloc)
+** small_size: maximum size of a small bloc (not including header and guards)
+** small_zone: size of allocated zones (including header and guards, zones can
+**   contain up to 128 bloc)
+** page_size: value returned by getpagesize()
+** guard_edges: size of edges to add to blocs, default 0
+** scribble: character to use has scribble on unalocated memory, default 0x42
+** tiny: pointer to the first zone of tiny blocs
+** small: pointer to the first zone of small blocs
+** large: pointer to the first zone of large blocs, default NULL
+*/
 
 struct						s_ma_handler
 {
@@ -130,10 +174,27 @@ extern pthread_mutex_t		g_ma_mutex;
 
 # endif
 
+/*
+** see man free, malloc, realloc
+*/
+
 void						free(void *ptr);
 void						*malloc(size_t size);
 void						*realloc(void *ptr, size_t size);
+
+/*
+** print the actually used memory zones of this library, the format can be
+** changed if define BONUS is set to 1 (-DBONUS=1 at compilation time) and
+** env has an entry named 'MALLOC_HEXDUMP' (no value is required)
+*/
+
 void						show_alloc_mem(void);
 
+/*
+** internal function to initialise the structure 'g_ma_handler' and to
+** pre-allocate 128 tiny and 128 small blocs
+*/
+
 void						malloc_init(void);
+
 #endif
