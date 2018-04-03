@@ -6,11 +6,11 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/03 10:53:36 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/03 13:06:49 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <malloc.h>
+#include <malloc_internal.h>
 
 /*
 ** struct, global, prototype
@@ -59,6 +59,8 @@ static inline void	sif_initial_alloc_tiny_small(void)
 }
 
 #if BONUS
+
+pthread_mutex_t		g_ma_mutex;
 
 static void			sf_final_free(void)
 {

@@ -2,6 +2,10 @@ ifeq ($(HOSTTYPE),)
 	HOSTTYPE := $(shell uname -m)_$(shell uname -s)
 endif
 
+ifeq ($(BONUS),)
+	BONUS := 0
+endif
+
 HNAME := libft_malloc_$(HOSTTYPE).so
 NAME := libft_malloc.so
 
@@ -17,11 +21,11 @@ $(NAME): $(HNAME)
 	ln -Fs $< $@
 
 $(HNAME): $(OBJ)
-	gcc -Wall -Wextra -Werror -shared -o $@ $^
+	gcc -Wall -Wextra -Werror -DBONUS=$(BONUS) -shared -o $@ $^
 
 obj/%.o: src/%.c inc/malloc.h Makefile
 	@mkdir -p obj
-	gcc -Wall -Wextra -Werror -I inc -o $@ -c $<
+	gcc -Wall -Wextra -Werror -DBONUS=$(BONUS) -I inc -o $@ -c $<
 
 clean:
 	rm -rf obj

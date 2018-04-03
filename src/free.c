@@ -6,14 +6,14 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 19:10:55 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/03 10:53:59 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/03 13:06:55 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
+#include <malloc_internal.h>
 
 /*
-** typedef size_t
+** struct, global, prototype
 */
 
 #include <sys/mman.h>
