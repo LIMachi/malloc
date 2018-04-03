@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 19:10:55 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/02 17:39:25 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/03 10:53:59 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,6 @@
 */
 
 #if BONUS
-
-# include <pthread.h>
-
-/*
-** pthread_mutex_t
-** int pthread_mutex_lock(pthread_mutex_t *mutex)
-** int pthread_mutex_unlock(pthread_mutex_t *mutex)
-*/
 
 void	free(void *ptr)
 {

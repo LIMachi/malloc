@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 19:17:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/02 19:24:11 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/03 11:56:56 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,25 +21,77 @@
 
 # define HINT_TINY_SIZE		64
 # define HINT_SMALL_SIZE	1024
-# define BONUS				0
 
-struct s_ma_page;
+# ifndef BONUS
+#  define BONUS				0
+# endif
 
-typedef struct				s_ma_header
+# if BONUS
+
+#  include <pthread.h>
+
+/*
+** pthread_mutex_t
+** int pthread_mutex_lock(pthread_mutex_t *mutex)
+** int pthread_mutex_unlock(pthread_mutex_t *mutex)
+*/
+
+# endif
+
+# pragma pack(push, 1)
+
+/*
+** size and previous does not include guard or header
+*/
+
+/*
+** sizeof(t_ma_header_small_tiny) == 4
+*/
+
+typedef struct				s_ma_header_small_tiny
 {
-	size_t					size;
-	size_t					flags;
-	struct s_ma_header		*previous;
-	struct s_ma_header		*next;
-	struct s_ma_page		*page;
-}							t_ma_header;
+	unsigned long long		size : 15;
+	unsigned long long		previous : 15;
+	unsigned long long		flags : 2;
+}							t_ma_header_small_tiny;
 
-typedef struct				s_ma_page
+/*
+** sizeof(t_ma_page) == 32 / 16
+*/
+
+# if __SIZEOF_POINTER__ == 8
+
+struct						s_ma_page_64
 {
-	void					*data;
+	unsigned long long		size : 63;
+	unsigned long long		last_block : 63;
+	unsigned long long		flags : 2;
 	struct s_ma_page		*previous;
 	struct s_ma_page		*next;
-}							t_ma_page;
+};
+
+#  define S_MA_PAGE		struct s_ma_page_64
+
+# elif __SIZEOF_POINTER__ == 4
+
+struct						s_ma_page_32
+{
+	unsigned long long		size : 31;
+	unsigned long long		last_block : 31;
+	unsigned long long		flags : 2;
+	struct s_ma_page		*previous;
+	struct s_ma_page		*next;
+};
+
+#  define S_MA_PAGE		struct s_ma_page_32
+
+# else
+#  error "Invalid pointer size"
+# endif
+
+# pragma pack(pop)
+
+typedef S_MA_PAGE			t_ma_page;
 
 typedef enum				e_mah_flags
 {

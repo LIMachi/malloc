@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/02 17:40:47 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/03 10:53:36 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,6 @@
 
 /*
 ** long long strtoll(const char *restrict str, char **restrict endptr, int base)
-*/
-
-# include <pthread.h>
-
-/*
-** pthread_mutex_t
-** int pthread_mutex_lock(pthread_mutex_t *mutex)
-** int pthread_mutex_unlock(pthread_mutex_t *mutex)
 */
 
 #endif
