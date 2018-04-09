@@ -15,17 +15,19 @@ OBJ :=	obj/malloc.o\
 		obj/malloc_init.o\
 		obj/show_alloc_mem.o
 
+FLAGS := -Wall -Wextra -Werror -DBONUS=$(BONUS) -fPIC
+
 all: $(NAME)
 
 $(NAME): $(HNAME)
 	ln -Fs $< $@
 
 $(HNAME): $(OBJ)
-	gcc -Wall -Wextra -Werror -DBONUS=$(BONUS) -shared -o $@ $^
+	gcc $(FLAGS) -shared -o $@ $^
 
 obj/%.o: src/%.c inc/malloc.h Makefile
 	@mkdir -p obj
-	gcc -Wall -Wextra -Werror -DBONUS=$(BONUS) -I inc -o $@ -c $<
+	gcc $(FLAGS) -I inc -o $@ -c $<
 
 clean:
 	rm -rf obj
