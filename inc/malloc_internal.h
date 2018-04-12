@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 17:01:26 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/12 20:53:12 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 */
 
 # define PREALLOC 					100
+
 # define TINY_EXPONENT_MULTIPLIER	(1.0 / 3.0)
 # define SMALL_EXPONENT_MULTIPLIER	(2.0 / 3.0)
 
@@ -108,6 +109,16 @@ typedef struct						s_ma_type_data
 }									t_ma_type_data;
 
 /*
+** struct							s_pseudo_header
+** {
+** 		t_ma_header_small_tiny		*next;
+** 		t_ma_header_small_tiny		*prev;
+** 		void						*pages[pages_per_header];
+** 		uint16_t					usage[pages_per_header][blocs_per_page];
+** };
+*/
+
+/*
 ** flags: see t_mah_flags definition above, default SCRIBBLE
 ** tiny_td, small_td: look t_ma_type_data
 ** page_size: value returned by getpagesize()
@@ -149,10 +160,10 @@ struct								s_ma_handler
 ** 	pages 8
 ** }
 ** blocs_tiny (16) {
-** 	owner 256 * pages
+** 	owner 2 * pages
 ** }
 ** blocs_small (128) {
-** 	owner 32 * pages
+** 	owner 2 * pages
 ** }
 ** total tiny: pages * 520 + 16 == 4096 ~= pages == 7 loss: 440
 ** total small: pages * 72 + 16 == 4096 ~= pages == 56 loss: 48

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/09 21:20:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 14:58:46 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/12 20:23:58 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static inline size_t				sif_sub_search(char **h,
 	while (*h != NULL)
 	{
 		n = 0;
-		pages = (size_t*)(*h + 16);
+		pages = ((size_t**)h)[2];
 		while (n < nb_pages && pages[n] != 0 &&
 				!(ptr >= pages[n] && ptr < pages[n] + g_ma_handler.page_size))
 			++n;

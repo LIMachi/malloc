@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 17:06:01 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/12 20:20:17 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ static void			sf_calc_sizes(size_t page_size, double exp_multiplier,
 	data->largest_size = 1 << (size_t)((double)exponent * next_exp_multiplier);
 	data->blocs_per_page = g_ma_handler.page_size / data->bloc_size;
 	data->pages_per_header = (page_size - __SIZEOF_POINTER__ * 2) /
-		(__SIZEOF_POINTER__ + data->blocs_per_page);
+		(__SIZEOF_POINTER__ + data->blocs_per_page * 2);
 	data->header_size = page_size;
 	if ((g_ma_handler.page_size / data->largest_size)
 		* data->pages_per_header < PREALLOC)

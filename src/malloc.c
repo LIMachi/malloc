@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 18:54:57 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 14:54:02 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/12 23:55:34 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,11 @@ void	*malloc(size_t size)
 
 void	*malloc(size_t size)
 {
-	(void)size;
+	size_t	nb_blocs;
+	int		type;
+
+	if (malloc_init() || size == 0)
+		return (NULL);
 	return (NULL);
 }
 
