@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/10 02:56:32 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/12 17:06:01 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,20 @@
 
 struct s_ma_handler	g_ma_handler = {
 	.flags = UNINITIALIZED,
-	.tiny_bloc = 0,
-	.tiny_page = 0,
-	.tiny_head_pages = 0,
-	.small_bloc = 0,
-	.small_page = 0,
-	.small_head_pages = 0,
+	.tiny_td = {
+		.bloc_size = 0,
+		.blocs_per_page = 0,
+		.pages_per_header = 0,
+		.header_size = 0,
+		.largest_size = 0
+	},
+	.small_td = {
+		.bloc_size = 0,
+		.blocs_per_page = 0,
+		.pages_per_header = 0,
+		.header_size = 0,
+		.largest_size = 0
+	},
 	.page_size = 0,
 	.guard_edges = 0,
 	.scribble = 0,
@@ -55,9 +63,26 @@ struct s_ma_handler	g_ma_handler = {
 	.large = NULL
 };
 
-static inline void	sif_initial_alloc_tiny_small(void)
+static void			sf_calc_sizes(size_t page_size, double exp_multiplier,
+							double next_exp_multiplier, t_ma_type_data *data)
 {
-	(void)0;
+	size_t	exponent;
+	size_t	tmp;
+
+	exponent = 1;
+	tmp = page_size;
+	while (tmp >>= 1)
+		++exponent;
+	data->bloc_size = 1 << (size_t)((double)exponent * exp_multiplier);
+	data->largest_size = 1 << (size_t)((double)exponent * next_exp_multiplier);
+	data->blocs_per_page = g_ma_handler.page_size / data->bloc_size;
+	data->pages_per_header = (page_size - __SIZEOF_POINTER__ * 2) /
+		(__SIZEOF_POINTER__ + data->blocs_per_page);
+	data->header_size = page_size;
+	if ((g_ma_handler.page_size / data->largest_size)
+		* data->pages_per_header < PREALLOC)
+		sf_calc_sizes(page_size + g_ma_handler.page_size, exp_multiplier,
+			next_exp_multiplier, data);
 }
 
 #if BONUS
@@ -100,62 +125,42 @@ static inline void	sif_load_env(void)
 		g_ma_handler.flags |= NO_FREE;
 }
 
-inline void			malloc_init(void)
+inline int			malloc_init(void)
 {
-	size_t	t1;
-	size_t	t2;
-
 	if (g_ma_handler.flags & INITIALIZED)
-		return ;
+		return (0);
 	sif_load_env();
 	g_ma_handler.page_size = (size_t)getpagesize();
-	t1 = g_ma_handler.page_size;
-	t2 = 1;
-	while (t1 >>= 1)
-		++t2;
-	t1 = t2 / 3;
-	g_ma_handler.tiny_bloc = 1 << t1;
-	g_ma_handler.small_bloc = 1 << (t2 - t1);
-	g_ma_handler.tiny_page = g_ma_handler.page_size / g_ma_handler.tiny_bloc;
-	g_ma_handler.small_page = g_ma_handler.page_size / g_ma_handler.small_bloc;
-	g_ma_handler.tiny_head_pages = (g_ma_handler.page_size
-		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
-		+ g_ma_handler.tiny_page * 2);
-	g_ma_handler.small_head_pages = (g_ma_handler.page_size
-		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
-		+ g_ma_handler.small_page * 2);
-	sif_initial_alloc_tiny_small();
+	sf_calc_sizes(g_ma_handler.page_size, TINY_EXPONENT_MULTIPLIER,
+		SMALL_EXPONENT_MULTIPLIER, &g_ma_handler.tiny_td);
+	sf_calc_sizes(g_ma_handler.page_size, SMALL_EXPONENT_MULTIPLIER, 1.0,
+		&g_ma_handler.small_td);
+	if ((g_ma_handler.tiny = ma_new_head(g_ma_handler.tiny_td)) == NULL)
+		return (-1);
+	if ((g_ma_handler.small = ma_new_head(g_ma_handler.small_td)) == NULL)
+		return (-1);
 	if (g_ma_handler.flags & FINAL_FREE)
 		atexit(&sf_final_free);
+	return (0);
 }
 
 #else
 
-inline void			malloc_init(void)
+inline int			malloc_init(void)
 {
-	size_t	t1;
-	size_t	t2;
-
 	if (g_ma_handler.flags & INITIALIZED)
-		return ;
+		return (0);
 	g_ma_handler.flags = INITIALIZED;
 	g_ma_handler.page_size = (size_t)getpagesize();
-	t1 = g_ma_handler.page_size;
-	t2 = 1;
-	while (t1 >>= 1)
-		++t2;
-	t1 = t2 / 3;
-	g_ma_handler.tiny_bloc = 1 << t1;
-	g_ma_handler.small_bloc = 1 << (t2 - t1);
-	g_ma_handler.tiny_page = g_ma_handler.page_size / g_ma_handler.tiny_bloc;
-	g_ma_handler.small_page = g_ma_handler.page_size / g_ma_handler.small_bloc;
-	g_ma_handler.tiny_head_pages = (g_ma_handler.page_size
-		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
-		+ g_ma_handler.tiny_page * 2);
-	g_ma_handler.small_head_pages = (g_ma_handler.page_size
-		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
-		+ g_ma_handler.small_page * 2);
-	sif_initial_alloc_tiny_small();
+	sf_calc_sizes(g_ma_handler.page_size, TINY_EXPONENT_MULTIPLIER,
+		SMALL_EXPONENT_MULTIPLIER, &g_ma_handler.tiny_td);
+	sf_calc_sizes(g_ma_handler.page_size, SMALL_EXPONENT_MULTIPLIER, 1.0,
+		&g_ma_handler.small_td);
+	if ((g_ma_handler.tiny = ma_new_head(g_ma_handler.tiny_td)) == NULL)
+		return (-1);
+	if ((g_ma_handler.small = ma_new_head(g_ma_handler.small_td)) == NULL)
+		return (-1);
+	return (0);
 }
 
 #endif

@@ -15,7 +15,11 @@ OBJ :=	obj/malloc.o\
 		obj/realloc.o\
 		obj/free.o\
 		obj/malloc_init.o\
-		obj/show_alloc_mem.o
+		obj/show_alloc_mem.o\
+		obj/ma_search_pointer.o\
+		obj/ma_new_page.o\
+		obj/ma_new_head.o\
+		obj/ma_search_space.o
 
 FLAGS := -Wall -Wextra -Werror -DBONUS=$(BONUS) -fPIC
 

@@ -1,54 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   malloc.c                                           :+:      :+:    :+:   */
+/*   ma_search_space.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/03/24 18:54:57 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 14:54:02 by hmartzol         ###   ########.fr       */
+/*   Created: 2018/04/12 15:02:37 by hmartzol          #+#    #+#             */
+/*   Updated: 2018/04/12 16:19:17 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 
 /*
-** struct, global, prototype
+** will search a space large enough to contain size
 */
 
-#include <sys/mman.h>
-
-/*
-** void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
-** int munmap(void *addr, size_t len)
-*/
-
-#include <unistd.h>
-
-/*
-** int getpagesize(void)
-** int close(int fd)
-*/
-
-#if BONUS
-
-void	*malloc(size_t size)
-{
-	void	*ptr_out;
-
-	pthread_mutex_lock(&g_ma_mutex);
-	(void)size;
-	ptr_out = NULL;
-	pthread_mutex_unlock(&g_ma_mutex);
-	return (ptr_out);
-}
-
-#else
-
-void	*malloc(size_t size)
+void	*ma_get_space(size_t size, int type, void **head)
 {
 	(void)size;
+	(void)type;
+	(void)head;
 	return (NULL);
 }
-
-#endif

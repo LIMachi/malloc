@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/10 02:50:36 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/12 17:01:26 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,14 @@
 /*
 ** typedef size_t
 */
+
+# define PREALLOC 					100
+# define TINY_EXPONENT_MULTIPLIER	(1.0 / 3.0)
+# define SMALL_EXPONENT_MULTIPLIER	(2.0 / 3.0)
+
+# define TINY 1
+# define SMALL 2
+# define LARGE 3
 
 # ifndef BONUS
 #  define BONUS				0
@@ -84,13 +92,24 @@ typedef enum				e_mah_flags
 }							t_mah_flags;
 
 /*
+** mostly explicit
+** header_size is the total size of the header (plus padding) and is a multiple
+** of getpagesize()
+** largest_size is the largest size of an allocation cutable in pages
+*/
+
+typedef struct						s_ma_type_data
+{
+	size_t							bloc_size;
+	size_t							blocs_per_page;
+	size_t							pages_per_header;
+	size_t							header_size;
+	size_t							largest_size;
+}									t_ma_type_data;
+
+/*
 ** flags: see t_mah_flags definition above, default SCRIBBLE
-** tiny_bloc: maximum size of a tiny bloc (not including header and guards)
-** tiny_page:
-** tiny_head_pages:
-** small_bloc: maximum size of a small bloc (not including header and guards)
-** small_page:
-** small_head_pages:
+** tiny_td, small_td: look t_ma_type_data
 ** page_size: value returned by getpagesize()
 ** guard_edges: size of edges to add to blocs, default 0
 ** scribble: character to use has scribble on unalocated memory, default 0x42
@@ -102,12 +121,8 @@ typedef enum				e_mah_flags
 struct								s_ma_handler
 {
 	t_mah_flags						flags;
-	size_t							tiny_bloc;
-	size_t							tiny_page;
-	size_t							tiny_head_pages;
-	size_t							small_bloc;
-	size_t							small_head_pages;
-	size_t							small_page;
+	t_ma_type_data					tiny_td;
+	t_ma_type_data					small_td;
 	size_t							page_size;
 	size_t							guard_edges;
 	char							scribble;
@@ -133,34 +148,38 @@ struct								s_ma_handler
 ** pages_pointers { pages * 8
 ** 	pages 8
 ** }
-** blocs_tiny (16) { pages * 512
-** 	usage 256 * pages
+** blocs_tiny (16) {
 ** 	owner 256 * pages
 ** }
-** blocs_small (128) { pages * 64
-** 	usage 32 * pages
+** blocs_small (128) {
 ** 	owner 32 * pages
 ** }
 ** total tiny: pages * 520 + 16 == 4096 ~= pages == 7 loss: 440
 ** total small: pages * 72 + 16 == 4096 ~= pages == 56 loss: 48
 ** blocs_per_pages = 4096 / BLOC_SIZE
 ** first alloc = ceil(128 / blocs_per_pages) * pages
-** bloc_head = 8 + blocs_per_pages * 2
+** bloc_head = 8 + blocs_per_pages
 ** pages == (int)(4080 / bloc_head)
 ** loss == 4080 - pages * bloc_head
 ** 1024 * malloc(1024) == aprox 5 header plus 256 small pages, 261 pages total
 ** search of pointer:
 ** first rule: never dereference a pointer given to free/realloc
-** test if pointer is in a page by comparing the pointer and the page itself (if ((size_t)pointer >= (size_t)page[n] && (size_t)pointer < pagesize + (size_t)page[n]))
-** since all allocated blocs are aligned on BLOC_SIZE, non aligned pointer must be refused (if (!((size_t)pointer - (size_t)page[n]) % BLOC_SIZE)))
-** finally, we can push the security further by testing if previous bloc are allocated to the same group
-** since all mmaped pages are never munmaped, pages_pointers are list of up to x pages and eventually NULL terminated (if less than x)
+** test if pointer is in a page by comparing the pointer and the page itself
+** since all allocated blocs are aligned on BLOC_SIZE, non aligned pointer must
+** be refused (if (!((size_t)pointer - (size_t)page[n]) % BLOC_SIZE)))
+** finally, we can push the security further by testing if previous bloc are
+** allocated to the same group
+** since all mmaped pages are never munmaped, pages_pointers are list of up to
+** x pages and eventually NULL terminated (if less than x)
 */
 
 extern struct s_ma_handler			g_ma_handler;
 
-void								malloc_init(void);
+int									malloc_init(void);
 void								*ma_search_pointer(const size_t ptr,
 												int *type, size_t *index);
+t_ma_header_small_tiny				*ma_new_page_tiny(size_t *index);
+t_ma_header_small_tiny				*ma_new_page_small(size_t *index);
+t_ma_header_small_tiny				*ma_new_head(t_ma_type_data td);
 
 #endif
