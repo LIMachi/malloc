@@ -6,12 +6,18 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/03 13:05:58 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/03 13:08:14 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/10 03:01:58 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MALLOC_H
 # define MALLOC_H
+
+# include <stddef.h>
+
+/*
+** typedef size_t
+*/
 
 /*
 ** see man free, malloc, realloc

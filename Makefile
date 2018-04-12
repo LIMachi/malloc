@@ -6,6 +6,8 @@ ifeq ($(BONUS),)
 	BONUS := 0
 endif
 
+TIME := /usr/bin/time -v
+
 HNAME := libft_malloc_$(HOSTTYPE).so
 NAME := libft_malloc.so
 
@@ -47,41 +49,41 @@ test_no_malloc_system:
 	clear
 	cat test/test0.c
 	gcc -o test/test0 test/test0.c
-	/usr/bin/time -l test/test0
+	$(TIME) test/test0
 
 test_malloc_system:
 	clear
 	cat test/test1.c
 	gcc -o test/test1 test/test1.c
-	/usr/bin/time -l test/test1
+	$(TIME) test/test1
 
 test_no_malloc_user: $(NAME)
 	clear
 	cat test/run.sh
 	cat test/test0.c
 	gcc -o test/test0 test/test0.c
-	test/run.sh /usr/bin/time -l test/test0
+	test/run.sh $(TIME) test/test0
 
 test_malloc_user: $(NAME)
 	clear
 	cat test/run.sh
 	cat test/test1.c
 	gcc -o test/test1 test/test1.c
-	test/run.sh /usr/bin/time -l test/test1
+	test/run.sh $(TIME) test/test1
 
 test_free_system:
 	clear
 	cat test/run.sh
 	cat test/test2.c
 	gcc -o test/test2 test/test2.c
-	/usr/bin/time -l test/test2
+	$(TIME) test/test2
 
 test_free_user: $(NAME)
 	clear
 	cat test/run.sh
 	cat test/test2.c
 	gcc -o test/test2 test/test2.c
-	test/run.sh /usr/bin/time -l test/test2
+	test/run.sh $(TIME) test/test2
 
 test_realloc_user: $(NAME)
 	clear

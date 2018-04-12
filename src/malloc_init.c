@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/03 13:06:49 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/10 02:56:32 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,18 @@
 
 struct s_ma_handler	g_ma_handler = {
 	.flags = UNINITIALIZED,
-	.tiny_size = 0,
-	.tiny_zone = 0,
-	.small_size = 0,
-	.small_zone = 0,
+	.tiny_bloc = 0,
+	.tiny_page = 0,
+	.tiny_head_pages = 0,
+	.small_bloc = 0,
+	.small_page = 0,
+	.small_head_pages = 0,
 	.page_size = 0,
 	.guard_edges = 0,
 	.scribble = 0,
-	.tiny = 0,
-	.small = 0,
-	.large = 0
+	.tiny = NULL,
+	.small = NULL,
+	.large = NULL
 };
 
 static inline void	sif_initial_alloc_tiny_small(void)
@@ -107,19 +109,21 @@ inline void			malloc_init(void)
 		return ;
 	sif_load_env();
 	g_ma_handler.page_size = (size_t)getpagesize();
-	t1 = HINT_TINY_SIZE;
-	while (g_ma_handler.page_size / (t1 + g_ma_handler.guard_edges * 2) < 128)
-		t1 >>= 1;
-	g_ma_handler.tiny_size = t1;
-	g_ma_handler.tiny_zone = g_ma_handler.page_size;
 	t1 = g_ma_handler.page_size;
-	t2 = HINT_SMALL_SIZE;
-	while ((t2 + g_ma_handler.guard_edges * 2) > t1)
-		t2 >>= 1;
-	while (t1 / t2 < 128)
-		t1 += g_ma_handler.page_size;
-	g_ma_handler.small_size = t2;
-	g_ma_handler.small_zone = t1;
+	t2 = 1;
+	while (t1 >>= 1)
+		++t2;
+	t1 = t2 / 3;
+	g_ma_handler.tiny_bloc = 1 << t1;
+	g_ma_handler.small_bloc = 1 << (t2 - t1);
+	g_ma_handler.tiny_page = g_ma_handler.page_size / g_ma_handler.tiny_bloc;
+	g_ma_handler.small_page = g_ma_handler.page_size / g_ma_handler.small_bloc;
+	g_ma_handler.tiny_head_pages = (g_ma_handler.page_size
+		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
+		+ g_ma_handler.tiny_page * 2);
+	g_ma_handler.small_head_pages = (g_ma_handler.page_size
+		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
+		+ g_ma_handler.small_page * 2);
 	sif_initial_alloc_tiny_small();
 	if (g_ma_handler.flags & FINAL_FREE)
 		atexit(&sf_final_free);
@@ -134,22 +138,23 @@ inline void			malloc_init(void)
 
 	if (g_ma_handler.flags & INITIALIZED)
 		return ;
-	g_ma_handler.flags = INITIALIZED | SCRIBBLE;
-	g_ma_handler.scribble = 0x42;
+	g_ma_handler.flags = INITIALIZED;
 	g_ma_handler.page_size = (size_t)getpagesize();
-	t1 = HINT_TINY_SIZE;
-	while (g_ma_handler.page_size / (t1 + g_ma_handler.guard_edges * 2) < 128)
-		t1 >>= 1;
-	g_ma_handler.tiny_size = t1;
-	g_ma_handler.tiny_zone = g_ma_handler.page_size;
 	t1 = g_ma_handler.page_size;
-	t2 = HINT_SMALL_SIZE;
-	while ((t2 + g_ma_handler.guard_edges * 2) > t1)
-		t2 >>= 1;
-	while (t1 / t2 < 128)
-		t1 += g_ma_handler.page_size;
-	g_ma_handler.small_size = t2;
-	g_ma_handler.small_zone = t1;
+	t2 = 1;
+	while (t1 >>= 1)
+		++t2;
+	t1 = t2 / 3;
+	g_ma_handler.tiny_bloc = 1 << t1;
+	g_ma_handler.small_bloc = 1 << (t2 - t1);
+	g_ma_handler.tiny_page = g_ma_handler.page_size / g_ma_handler.tiny_bloc;
+	g_ma_handler.small_page = g_ma_handler.page_size / g_ma_handler.small_bloc;
+	g_ma_handler.tiny_head_pages = (g_ma_handler.page_size
+		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
+		+ g_ma_handler.tiny_page * 2);
+	g_ma_handler.small_head_pages = (g_ma_handler.page_size
+		- __SIZEOF_POINTER__ * 2) / (__SIZEOF_POINTER__
+		+ g_ma_handler.small_page * 2);
 	sif_initial_alloc_tiny_small();
 }
 
