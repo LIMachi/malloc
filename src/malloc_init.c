@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 20:20:17 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/13 06:46:02 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@
 */
 
 #if BONUS
+
+# include <string.h>
+
+/*
+** int strcmp(const char *s1, const char *s2);
+*/
 
 # include <stdlib.h>
 
@@ -100,17 +106,12 @@ static inline void	sif_load_env(void)
 {
 	char	*v;
 
-	g_ma_handler.flags = (g_ma_handler.flags & ~UNINITIALIZED) | INITIALIZED;
-	if (NULL != (v = getenv("MALLOC_SCRIBBLE")))
-	{
+	if (NULL != (v = getenv("MALLOC_SCRIBBLE")) &&
+			(g_ma_handler.flags |= SCRIBBLE))
 		g_ma_handler.scribble = (char)strtoll(v, NULL, 0);
-		g_ma_handler.flags |= SCRIBBLE;
-	}
-	if (NULL != (v = getenv("MALLOC_GUARD_EDGES")))
-	{
+	if (NULL != (v = getenv("MALLOC_GUARD_EDGES")) &&
+			(g_ma_handler.flags |= GUARD_EDGES))
 		g_ma_handler.guard_edges = (size_t)strtoll(v, NULL, 0);
-		g_ma_handler.flags |= GUARD_EDGES;
-	}
 	if (NULL != getenv("MALLOC_ALLOC_LOG"))
 		g_ma_handler.flags |= ALLOC_LOG;
 	if (NULL != getenv("MALLOC_FREE_LOG"))
@@ -123,12 +124,18 @@ static inline void	sif_load_env(void)
 		g_ma_handler.flags |= FINAL_FREE;
 	if (NULL != getenv("MALLOC_NO_FREE"))
 		g_ma_handler.flags |= NO_FREE;
+	if (NULL != (v = getenv("MALLOC_MODE")))
+		g_ma_handler.flags |= MODE * (!strcmp(v, "LIST") ||
+			(!strcmp(v, "DEFAULT") && MA_MODE_DEFAULT == MA_MODE_LIST));
+	else
+		g_ma_handler.flags |= MODE * (MA_MODE_DEFAULT == MA_MODE_LIST);
 }
 
 inline int			malloc_init(void)
 {
 	if (g_ma_handler.flags & INITIALIZED)
 		return (0);
+	g_ma_handler.flags = (g_ma_handler.flags & ~UNINITIALIZED) | INITIALIZED;
 	sif_load_env();
 	g_ma_handler.page_size = (size_t)getpagesize();
 	sf_calc_sizes(g_ma_handler.page_size, TINY_EXPONENT_MULTIPLIER,
@@ -150,7 +157,7 @@ inline int			malloc_init(void)
 {
 	if (g_ma_handler.flags & INITIALIZED)
 		return (0);
-	g_ma_handler.flags = INITIALIZED;
+	g_ma_handler.flags = INITIALIZED | MODE * (MA_MODE_DEFAULT == MA_MODE_LIST);
 	g_ma_handler.page_size = (size_t)getpagesize();
 	sf_calc_sizes(g_ma_handler.page_size, TINY_EXPONENT_MULTIPLIER,
 		SMALL_EXPONENT_MULTIPLIER, &g_ma_handler.tiny_td);

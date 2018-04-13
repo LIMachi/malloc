@@ -6,27 +6,14 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 20:53:12 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/13 06:35:43 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MALLOC_INTERNAL_H
 # define MALLOC_INTERNAL_H
 
-# include <stddef.h>
-
-/*
-** typedef size_t
-*/
-
-# define PREALLOC 					100
-
-# define TINY_EXPONENT_MULTIPLIER	(1.0 / 3.0)
-# define SMALL_EXPONENT_MULTIPLIER	(2.0 / 3.0)
-
-# define TINY 1
-# define SMALL 2
-# define LARGE 3
+# include <malloc.h>
 
 # ifndef BONUS
 #  define BONUS				0
@@ -46,18 +33,62 @@ extern pthread_mutex_t				g_ma_mutex;
 
 # endif
 
+/*
+** MA_MODE_LIST
+** total_size is the size of the pool (including the pool header itself)
+** total_size is a multiple of getpagesize and should be able to andle up to
+** PREALLOC alloc of maximum size of the type of the page (tiny/small)
+** in the case of large bloc, the page group contain no lists and the data is
+** directly accesible via the fake array data. otherwise, use data as the first
+** link of the t_ma_header_pool_link list
+*/
+
+typedef struct						s_ma_header_pool
+{
+	struct s_ma_header_pool			*next;
+	struct s_ma_header_pool			*prev;
+	size_t							total_size;
+	char							data[0];
+}									t_ma_header_pool;
+
+/*
+** MA_MODE_LIST
+** alternative bloc header for MA_MODE_LIST, the lowest significant bit of
+** size is used as free flag, size will always be treated as a multiple of 2
+*/
+
+typedef struct						s_ma_header_pool_link
+{
+	struct s_ma_header_pool_link	*next;
+	struct s_ma_header_pool_link	*prev;
+	size_t							size;
+	char							data[0];
+}									t_ma_header_pool_link;
+
+/*
+** MA_MODE_BLOC
+** similar to t_ma_header_pool, explicitly used for large in MA_MODE_BLOC
+*/
+
 typedef struct						s_ma_header_large
 {
 	struct s_ma_large_header		*next;
 	struct s_ma_large_header		*prev;
-	int								status;
 	size_t							size;
+	char							data[0];
 }									t_ma_header_large;
+
+/*
+** MA_MODE_BLOC
+** common header for small and tiny group page, note that after pages (which is
+** variable in length) is another array of the form uint16_t usage[page][bloc]
+*/
 
 typedef struct						s_ma_header_small_tiny
 {
 	struct s_ma_header_small_tiny	*next;
 	struct s_ma_header_small_tiny	*prev;
+	void							*pages[0];
 }									t_ma_header_small_tiny;
 
 /*
@@ -76,6 +107,7 @@ typedef struct						s_ma_header_small_tiny
 ** FRAGMENTED: disable defragmentation of freed memory, for testing purpose
 ** FINAL_FREE: call free on all allocated memory on program exit
 ** NO_FREE: disable entirely the calls to free, for testing purpose
+** MODE: if set, MA_MODE_LIST will be used over MA_MODE_BLOC
 */
 
 typedef enum				e_mah_flags
@@ -89,7 +121,8 @@ typedef enum				e_mah_flags
 	HEXDUMP = 32,
 	FRAGMENTED = 64,
 	FINAL_FREE = 128,
-	NO_FREE = 256
+	NO_FREE = 256,
+	MODE = 512
 }							t_mah_flags;
 
 /*
@@ -97,6 +130,7 @@ typedef enum				e_mah_flags
 ** header_size is the total size of the header (plus padding) and is a multiple
 ** of getpagesize()
 ** largest_size is the largest size of an allocation cutable in pages
+** some of those information are discarded in MA_MODE_LIST
 */
 
 typedef struct						s_ma_type_data
