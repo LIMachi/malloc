@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/13 06:35:43 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/15 00:26:05 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,13 @@ typedef struct						s_ma_header_large
 ** MA_MODE_BLOC
 ** common header for small and tiny group page, note that after pages (which is
 ** variable in length) is another array of the form uint16_t usage[page][bloc]
+** struct							s_pseudo_header
+** {
+** 		t_ma_header_small_tiny		*next;
+** 		t_ma_header_small_tiny		*prev;
+** 		void						*pages[pages_per_header];
+** 		uint16_t					usage[pages_per_header][blocs_per_page];
+** };
 */
 
 typedef struct						s_ma_header_small_tiny
@@ -90,6 +97,10 @@ typedef struct						s_ma_header_small_tiny
 	struct s_ma_header_small_tiny	*prev;
 	void							*pages[0];
 }									t_ma_header_small_tiny;
+
+# define BLOCP(td, header) ((*uint16_t)&header->pages[td.pages_per_header])		//FIXME: not norm conformant
+# define BLOCA(b, td, page, bloc) (b[page * td.blocs_per_page + bloc])			//FIXME: not norm conformant
+# define BLOC(td, header, page, bloc) BLOCA(BLOCP(td, header), page, bloc)		//FIXME: not norm conformant
 
 /*
 ** UNINITIALIZED: default state
@@ -143,14 +154,15 @@ typedef struct						s_ma_type_data
 }									t_ma_type_data;
 
 /*
-** struct							s_pseudo_header
-** {
-** 		t_ma_header_small_tiny		*next;
-** 		t_ma_header_small_tiny		*prev;
-** 		void						*pages[pages_per_header];
-** 		uint16_t					usage[pages_per_header][blocs_per_page];
-** };
+** collection of pointers to function used to switch between bloc and list mode
 */
+
+typedef struct						s_ma_func
+{
+	void							*(*new_head)(t_ma_type_data);
+	void							*(*new_page_tiny)(size_t *);
+	void							*(*new_page_small)(size_t *);
+}									t_ma_func;
 
 /*
 ** flags: see t_mah_flags definition above, default SCRIBBLE
@@ -174,57 +186,19 @@ struct								s_ma_handler
 	t_ma_header_small_tiny			*tiny;
 	t_ma_header_small_tiny			*small;
 	t_ma_header_large				*large;
+	t_ma_func						func;
 };
-
-/*
-** transform getpagesize in a power representation (ex 4096 == 2p12)
-** then cut the power in one third / two third (ex 2p12 == 2p4 * 2p8)
-** the low power represent the tiny block, the high power represent the small
-** ex for 4096: tiny: 64, small: 256
-** it is the most omogenous, but not the most optimised for small allocations
-*/
-
-/*
-** 4096
-** head {		16
-** 	prev	8
-** 	next	8
-** }
-** pages_pointers { pages * 8
-** 	pages 8
-** }
-** blocs_tiny (16) {
-** 	owner 2 * pages
-** }
-** blocs_small (128) {
-** 	owner 2 * pages
-** }
-** total tiny: pages * 520 + 16 == 4096 ~= pages == 7 loss: 440
-** total small: pages * 72 + 16 == 4096 ~= pages == 56 loss: 48
-** blocs_per_pages = 4096 / BLOC_SIZE
-** first alloc = ceil(128 / blocs_per_pages) * pages
-** bloc_head = 8 + blocs_per_pages
-** pages == (int)(4080 / bloc_head)
-** loss == 4080 - pages * bloc_head
-** 1024 * malloc(1024) == aprox 5 header plus 256 small pages, 261 pages total
-** search of pointer:
-** first rule: never dereference a pointer given to free/realloc
-** test if pointer is in a page by comparing the pointer and the page itself
-** since all allocated blocs are aligned on BLOC_SIZE, non aligned pointer must
-** be refused (if (!((size_t)pointer - (size_t)page[n]) % BLOC_SIZE)))
-** finally, we can push the security further by testing if previous bloc are
-** allocated to the same group
-** since all mmaped pages are never munmaped, pages_pointers are list of up to
-** x pages and eventually NULL terminated (if less than x)
-*/
 
 extern struct s_ma_handler			g_ma_handler;
 
 int									malloc_init(void);
 void								*ma_search_pointer(const size_t ptr,
 												int *type, size_t *index);
-t_ma_header_small_tiny				*ma_new_page_tiny(size_t *index);
-t_ma_header_small_tiny				*ma_new_page_small(size_t *index);
-t_ma_header_small_tiny				*ma_new_head(t_ma_type_data td);
+void								*ma_new_page_tiny_list(size_t *index);
+void								*ma_new_page_small_list(size_t *index);
+void								*ma_new_head_list(t_ma_type_data td);
+void								*ma_new_page_tiny_bloc(size_t *index);
+void								*ma_new_page_small_bloc(size_t *index);
+void								*ma_new_head_bloc(t_ma_type_data td);
 
 #endif

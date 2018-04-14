@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 13:16:47 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 23:24:51 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/15 00:26:51 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 ** int munmap(void *addr, size_t len)
 */
 
-t_ma_header_small_tiny	*ma_new_head(t_ma_type_data td)
+void	*ma_new_head_bloc(t_ma_type_data td)
 {
 	void					**head;
 	size_t					i;

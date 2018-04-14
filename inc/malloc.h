@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/03 13:05:58 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/13 06:44:03 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/14 23:52:50 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,14 @@
 ** allocation is separated from data)
 ** MA_MODE_LIST (use linked list style allocation, information and data are next
 ** to each other)
-** MA_MODE_LIST is much faster but less secure
+** MA_MODE_LIST is much faster but less secure (dereference pointer content)
 ** MA_MODE_BLOC is slower but less prone to error on miswrinting in invalid
 ** addresses
 ** if in BONUS mode (define BONUS to not be 0), MA_MODE_DEFAULT can be
 ** overwriten at run time by the env entry: MALLOC_MODE=LIST/BLOC/DEFAULT
 */
 
-# define MA_MODE_DEFAULT MA_MODE_BLOC
+# define MA_MODE_DEFAULT	MA_MODE_BLOC
 
 /*
 ** see man free, malloc, realloc

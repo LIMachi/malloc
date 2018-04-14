@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:10:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/12 17:00:03 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/15 00:26:45 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 ** return the page_head and index in which the new page was inserted
 */
 
-t_ma_header_small_tiny	*ma_new_page_tiny(size_t *index)
+void	*ma_new_page_tiny_bloc(size_t *index)
 {
 	t_ma_header_small_tiny	*head;
 
@@ -44,7 +44,7 @@ t_ma_header_small_tiny	*ma_new_page_tiny(size_t *index)
 		}
 		head = head->next;
 	}
-	if ((head = ma_new_head(g_ma_handler.tiny_td)) == NULL)
+	if ((head = g_ma_handler.func.new_head(g_ma_handler.tiny_td)) == NULL)
 		return (NULL);
 	head->next = g_ma_handler.tiny;
 	g_ma_handler.tiny->prev = head;
@@ -52,7 +52,7 @@ t_ma_header_small_tiny	*ma_new_page_tiny(size_t *index)
 	return ((g_ma_handler.tiny = head));
 }
 
-t_ma_header_small_tiny	*ma_new_page_small(size_t *index)
+void	*ma_new_page_small_bloc(size_t *index)
 {
 	t_ma_header_small_tiny	*head;
 
@@ -71,7 +71,7 @@ t_ma_header_small_tiny	*ma_new_page_small(size_t *index)
 		}
 		head = head->next;
 	}
-	if ((head = ma_new_head(g_ma_handler.small_td)) == NULL)
+	if ((head = g_ma_handler.func.new_head(g_ma_handler.small_td)) == NULL)
 		return (NULL);
 	head->next = g_ma_handler.small;
 	g_ma_handler.small->prev = head;

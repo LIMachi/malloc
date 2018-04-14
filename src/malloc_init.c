@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/13 06:46:02 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/15 00:26:31 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,12 @@ struct s_ma_handler	g_ma_handler = {
 	.scribble = 0,
 	.tiny = NULL,
 	.small = NULL,
-	.large = NULL
+	.large = NULL,
+	.func = {
+		.new_head = NULL,
+		.new_page_tiny = NULL,
+		.new_page_small = NULL
+	}
 };
 
 static void			sf_calc_sizes(size_t page_size, double exp_multiplier,
@@ -142,9 +147,17 @@ inline int			malloc_init(void)
 		SMALL_EXPONENT_MULTIPLIER, &g_ma_handler.tiny_td);
 	sf_calc_sizes(g_ma_handler.page_size, SMALL_EXPONENT_MULTIPLIER, 1.0,
 		&g_ma_handler.small_td);
-	if ((g_ma_handler.tiny = ma_new_head(g_ma_handler.tiny_td)) == NULL)
+	if (g_ma_handler.flags & MODE)
+		g_ma_handler.func = (t_ma_func){.new_page_tiny = &ma_new_page_tiny_list,
+	.new_head = &ma_new_head_list, .new_page_small = &ma_new_page_small_list};
+	else
+		g_ma_handler.func = (t_ma_func){.new_page_tiny = &ma_new_page_tiny_bloc,
+	.new_head = &ma_new_head_bloc, .new_page_small = &ma_new_page_small_bloc};
+	if ((g_ma_handler.tiny = g_ma_handler.func.new_head(
+			g_ma_handler.tiny_td)) == NULL)
 		return (-1);
-	if ((g_ma_handler.small = ma_new_head(g_ma_handler.small_td)) == NULL)
+	if ((g_ma_handler.small = g_ma_handler.func.new_head(
+			g_ma_handler.small_td)) == NULL)
 		return (-1);
 	if (g_ma_handler.flags & FINAL_FREE)
 		atexit(&sf_final_free);
@@ -163,9 +176,17 @@ inline int			malloc_init(void)
 		SMALL_EXPONENT_MULTIPLIER, &g_ma_handler.tiny_td);
 	sf_calc_sizes(g_ma_handler.page_size, SMALL_EXPONENT_MULTIPLIER, 1.0,
 		&g_ma_handler.small_td);
-	if ((g_ma_handler.tiny = ma_new_head(g_ma_handler.tiny_td)) == NULL)
+	if (g_ma_handler.flags & MODE)
+		g_ma_handler.func = (t_ma_func){.new_page_tiny = &ma_new_page_tiny_list,
+	.new_head = &ma_new_head_list, .new_page_small = &ma_new_page_small_list};
+	else
+		g_ma_handler.func = (t_ma_func){.new_page_tiny = &ma_new_page_tiny_bloc,
+	.new_head = &ma_new_head_bloc, .new_page_small = &ma_new_page_small_bloc};
+	if ((g_ma_handler.tiny = g_ma_handler.func.new_head(
+			g_ma_handler.tiny_td)) == NULL)
 		return (-1);
-	if ((g_ma_handler.small = ma_new_head(g_ma_handler.small_td)) == NULL)
+	if ((g_ma_handler.small = g_ma_handler.func.new_head(
+			g_ma_handler.small_td)) == NULL)
 		return (-1);
 	return (0);
 }
