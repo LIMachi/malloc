@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/13 06:01:24 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/13 06:10:53 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/16 16:13:21 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,7 @@
 # define TINY 1
 # define SMALL 2
 # define LARGE 3
+
+# define USED 1
 
 #endif

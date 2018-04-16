@@ -19,14 +19,15 @@ OBJ :=	obj/malloc.o\
 		obj/ma_search_pointer.o\
 		obj/ma_new_page.o\
 		obj/ma_new_head.o\
-		obj/ma_search_space.o
+		obj/ma_get_space.o
 
 FLAGS := -Wall -Wextra -Werror -DBONUS=$(BONUS) -fPIC
 
 all: $(NAME)
 
 $(NAME): $(HNAME)
-	ln -Fs $< $@
+	rm -f $@
+	ln -s $< $@
 
 $(HNAME): $(OBJ)
 	gcc $(FLAGS) -shared -o $@ $^

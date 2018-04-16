@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:10:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/15 00:26:45 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/16 17:03:16 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 ** return the page_head and index in which the new page was inserted
 */
 
-void	*ma_new_page_tiny_bloc(size_t *index)
+void	*ma_new_page_tiny(size_t *index)
 {
 	t_ma_header_small_tiny	*head;
 
@@ -52,7 +52,7 @@ void	*ma_new_page_tiny_bloc(size_t *index)
 	return ((g_ma_handler.tiny = head));
 }
 
-void	*ma_new_page_small_bloc(size_t *index)
+void	*ma_new_page_small(size_t *index)
 {
 	t_ma_header_small_tiny	*head;
 

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/15 00:26:05 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/16 17:11:24 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,9 @@ typedef struct						s_ma_header_pool
 ** MA_MODE_LIST
 ** alternative bloc header for MA_MODE_LIST, the lowest significant bit of
 ** size is used as free flag, size will always be treated as a multiple of 2
+** prev is the size of the last allocation, 0 means this link is the first
+** position of the header + size might be equal to the last byte of the pool, if
+** so, this design the current link as the last
 */
 
 typedef struct						s_ma_header_pool_link
@@ -72,8 +75,8 @@ typedef struct						s_ma_header_pool_link
 
 typedef struct						s_ma_header_large
 {
-	struct s_ma_large_header		*next;
-	struct s_ma_large_header		*prev;
+	struct s_ma_header_large		*next;
+	struct s_ma_header_large		*prev;
 	size_t							size;
 	char							data[0];
 }									t_ma_header_large;
@@ -98,9 +101,7 @@ typedef struct						s_ma_header_small_tiny
 	void							*pages[0];
 }									t_ma_header_small_tiny;
 
-# define BLOCP(td, header) ((*uint16_t)&header->pages[td.pages_per_header])		//FIXME: not norm conformant
-# define BLOCA(b, td, page, bloc) (b[page * td.blocs_per_page + bloc])			//FIXME: not norm conformant
-# define BLOC(td, header, page, bloc) BLOCA(BLOCP(td, header), page, bloc)		//FIXME: not norm conformant
+# define _																		//FIXME: not norm compliant
 
 /*
 ** UNINITIALIZED: default state
@@ -116,9 +117,9 @@ typedef struct						s_ma_header_small_tiny
 ** FREE_LOG: print information on calls to free
 ** HEXDUMP: extend the output format of 'show_alloc_mem'
 ** FRAGMENTED: disable defragmentation of freed memory, for testing purpose
-** FINAL_FREE: call free on all allocated memory on program exit
 ** NO_FREE: disable entirely the calls to free, for testing purpose
-** MODE: if set, MA_MODE_LIST will be used over MA_MODE_BLOC
+** the last flag is set by MALLOC_MODE=LIST/DEFAULT/BLOC
+** MODE_LIST: if set, MA_MODE_LIST will be used over MA_MODE_BLOC
 */
 
 typedef enum				e_mah_flags
@@ -131,9 +132,8 @@ typedef enum				e_mah_flags
 	FREE_LOG = 16,
 	HEXDUMP = 32,
 	FRAGMENTED = 64,
-	FINAL_FREE = 128,
-	NO_FREE = 256,
-	MODE = 512
+	NO_FREE = 128,
+	MODE_LIST = 256
 }							t_mah_flags;
 
 /*
@@ -142,6 +142,7 @@ typedef enum				e_mah_flags
 ** of getpagesize()
 ** largest_size is the largest size of an allocation cutable in pages
 ** some of those information are discarded in MA_MODE_LIST
+** header_size is used as pool size in LIST mode
 */
 
 typedef struct						s_ma_type_data
@@ -159,9 +160,9 @@ typedef struct						s_ma_type_data
 
 typedef struct						s_ma_func
 {
-	void							*(*new_head)(t_ma_type_data);
-	void							*(*new_page_tiny)(size_t *);
-	void							*(*new_page_small)(size_t *);
+	void						*(*new_head)(t_ma_type_data);
+	void						*(*get_space)(size_t, t_ma_type_data, void**);
+	void						*(*search_pointer)(const size_t, int*, size_t*);
 }									t_ma_func;
 
 /*
@@ -192,13 +193,16 @@ struct								s_ma_handler
 extern struct s_ma_handler			g_ma_handler;
 
 int									malloc_init(void);
-void								*ma_search_pointer(const size_t ptr,
+void								*ma_search_pointer_bloc(const size_t ptr,
 												int *type, size_t *index);
-void								*ma_new_page_tiny_list(size_t *index);
-void								*ma_new_page_small_list(size_t *index);
+void								*ma_search_pointer_list(const size_t ptr,
+												int *type, size_t *index);
+void								*ma_new_page_tiny(size_t *index);
+void								*ma_new_page_small(size_t *index);
 void								*ma_new_head_list(t_ma_type_data td);
-void								*ma_new_page_tiny_bloc(size_t *index);
-void								*ma_new_page_small_bloc(size_t *index);
 void								*ma_new_head_bloc(t_ma_type_data td);
-
+void								*ma_get_space_bloc(size_t size,
+											t_ma_type_data td, void **head);
+void								*ma_get_space_list(size_t size,
+											t_ma_type_data td, void **head);
 #endif
