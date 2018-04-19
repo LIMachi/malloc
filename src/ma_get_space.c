@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:02:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/16 17:08:53 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/19 04:19:15 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void					*ma_get_space_bloc(size_t size, t_ma_type_data td,
 					return (tmp);
 			}
 		}
-		head = (void**)((t_ma_header_small_tiny*)head)->next;
+		head = (void**)((t_ma_header_bloc*)head)->next;
 	}
 	return (NULL);
 }
@@ -116,24 +116,24 @@ void					*ma_get_space_bloc(size_t size, t_ma_type_data td,
 void					*ma_get_space_list(size_t size, t_ma_type_data td,
 										void **head)
 {
-	t_ma_header_pool_link	*link;
-	t_ma_header_pool_link	*tmp;
+	t_ma_header_link	*link;
+	t_ma_header_link	*tmp;
 
 	(void)td;
 	while (*head != NULL)
 	{
-		link = (t_ma_header_pool_link*)(((t_ma_header_pool*)*head)->data);
+		link = (t_ma_header_link*)(((t_ma_header_link*)*head)->data);
 		while (link != NULL &&
 				((link->size & USED) || (link->size & ~USED) < size))
 			link = link->next;
-		if (link == NULL && _(*head = ((t_ma_header_pool*)*head)->next, 1))
+		if (link == NULL && _(*head = ((t_ma_header_link*)*head)->next, 1))
 			continue ;
-		if ((link->size & ~USED) >= size + sizeof(t_ma_header_pool_link))
+		if ((link->size & ~USED) >= size + sizeof(t_ma_header_link))
 		{
 			tmp = link->next;
-			link->next = (t_ma_header_pool_link*)&link->data[size];
-			*link->next = (t_ma_header_pool_link){.prev = link, .next = tmp,
-	.size = (link->prev->size & ~USED) - size - sizeof(t_ma_header_pool_link)};
+			link->next = (t_ma_header_link*)&link->data[size];
+			*link->next = (t_ma_header_link){.prev = link, .next = tmp,
+	.size = (link->prev->size & ~USED) - size - sizeof(t_ma_header_link)};
 			link->size = size & USED;
 		}
 		else

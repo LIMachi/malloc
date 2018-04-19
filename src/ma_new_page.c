@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:10:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/16 17:03:16 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/19 04:16:30 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,56 +25,30 @@
 ** return the page_head and index in which the new page was inserted
 */
 
-void	*ma_new_page_tiny(size_t *index)
+void	*ma_new_page(t_ma_header_bloc **head, const t_ma_type_data td,
+					size_t *index)
 {
-	t_ma_header_small_tiny	*head;
+	t_ma_header_bloc	*tmp;
 
-	head = g_ma_handler.tiny;
-	while (head != NULL)
+	tmp = *head;
+	while (tmp != NULL)
 	{
 		*index = 0;
-		while (*index < g_ma_handler.tiny_td.pages_per_header &&
-				((void**)head)[2 + *index] != NULL)
+		while (*index < td.pages_per_header &&
+				((void**)tmp)[2 + *index] != NULL)
 			++*index;
-		if (*index < g_ma_handler.tiny_td.pages_per_header)
+		if (*index < td.pages_per_header)
 		{
-			((void**)head)[2 + *index] = mmap(0, g_ma_handler.page_size,
+			((void**)tmp)[2 + *index] = mmap(0, g_ma_handler.page_size,
 				PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-			return (head);
+			return (tmp);
 		}
-		head = head->next;
+		tmp = tmp->next;
 	}
-	if ((head = g_ma_handler.func.new_head(g_ma_handler.tiny_td)) == NULL)
+	if ((tmp = g_ma_handler.func.new_head(td)) == NULL)
 		return (NULL);
-	head->next = g_ma_handler.tiny;
-	g_ma_handler.tiny->prev = head;
+	tmp->next = *head;
+	(*head)->prev = tmp;
 	*index = 0;
-	return ((g_ma_handler.tiny = head));
-}
-
-void	*ma_new_page_small(size_t *index)
-{
-	t_ma_header_small_tiny	*head;
-
-	head = g_ma_handler.small;
-	while (head != NULL)
-	{
-		*index = 0;
-		while (*index < g_ma_handler.small_td.pages_per_header &&
-				((void**)head)[2 + *index] != NULL)
-			++*index;
-		if (*index < g_ma_handler.small_td.pages_per_header)
-		{
-			((void**)head)[2 + *index] = mmap(0, g_ma_handler.page_size,
-				PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-			return (head);
-		}
-		head = head->next;
-	}
-	if ((head = g_ma_handler.func.new_head(g_ma_handler.small_td)) == NULL)
-		return (NULL);
-	head->next = g_ma_handler.small;
-	g_ma_handler.small->prev = head;
-	*index = 0;
-	return ((g_ma_handler.small = head));
+	return ((*head = tmp));
 }

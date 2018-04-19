@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/16 17:11:24 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/19 04:15:27 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,77 +29,51 @@
 ** int pthread_mutex_unlock(pthread_mutex_t *mutex)
 */
 
-extern pthread_mutex_t				g_ma_mutex;
+extern pthread_mutex_t		g_ma_mutex;
 
 # endif
 
 /*
-** MA_MODE_LIST
-** total_size is the size of the pool (including the pool header itself)
-** total_size is a multiple of getpagesize and should be able to andle up to
-** PREALLOC alloc of maximum size of the type of the page (tiny/small)
+** MA_MODE_LIST / MA_MODE_BLOC (large only)
+** size is the size of the pool (including the pool header itself)
+** or the size of the allocated data (not including the header)
+** (page/large) size is a multiple of getpagesize and should be able to andle up
+** to PREALLOC alloc of maximum size of the type of the page (tiny/small)
 ** in the case of large bloc, the page group contain no lists and the data is
 ** directly accesible via the fake array data. otherwise, use data as the first
-** link of the t_ma_header_pool_link list
+** link of the list
 */
 
-typedef struct						s_ma_header_pool
+typedef struct				s_ma_header_link
 {
-	struct s_ma_header_pool			*next;
-	struct s_ma_header_pool			*prev;
-	size_t							total_size;
-	char							data[0];
-}									t_ma_header_pool;
-
-/*
-** MA_MODE_LIST
-** alternative bloc header for MA_MODE_LIST, the lowest significant bit of
-** size is used as free flag, size will always be treated as a multiple of 2
-** prev is the size of the last allocation, 0 means this link is the first
-** position of the header + size might be equal to the last byte of the pool, if
-** so, this design the current link as the last
-*/
-
-typedef struct						s_ma_header_pool_link
-{
-	struct s_ma_header_pool_link	*next;
-	struct s_ma_header_pool_link	*prev;
-	size_t							size;
-	char							data[0];
-}									t_ma_header_pool_link;
-
-/*
-** MA_MODE_BLOC
-** similar to t_ma_header_pool, explicitly used for large in MA_MODE_BLOC
-*/
-
-typedef struct						s_ma_header_large
-{
-	struct s_ma_header_large		*next;
-	struct s_ma_header_large		*prev;
-	size_t							size;
-	char							data[0];
-}									t_ma_header_large;
+	struct s_ma_header_link	*next;
+	struct s_ma_header_link	*prev;
+	size_t					size;
+	char					data[0];
+}							t_ma_header_link;
 
 /*
 ** MA_MODE_BLOC
 ** common header for small and tiny group page, note that after pages (which is
 ** variable in length) is another array of the form uint16_t usage[page][bloc]
+** accessing usage:
+** uint16_t *usage = (uint16_t*)&head->pages[td.pages_per_header];
+** usage[page * td.blocs_per_page + bloc]
 ** struct							s_pseudo_header
 ** {
 ** 		t_ma_header_small_tiny		*next;
 ** 		t_ma_header_small_tiny		*prev;
 ** 		void						*pages[pages_per_header];
-** 		uint16_t					usage[pages_per_header][blocs_per_page];
+** 		uint16_t					usage[blocs_per_page * pages_per_header];
 ** };
 */
 
-typedef struct						s_ma_header_small_tiny
+typedef struct				s_ma_header_bloc
 {
-	struct s_ma_header_small_tiny	*next;
-	struct s_ma_header_small_tiny	*prev;
-	void							*pages[0];
-}									t_ma_header_small_tiny;
+	struct s_ma_header_bloc	*next;
+	struct s_ma_header_bloc	*prev;
+	void					*pages[0];
+}							t_ma_header_bloc;
 
 # define _																		//FIXME: not norm compliant
 
@@ -133,7 +107,9 @@ typedef enum				e_mah_flags
 	HEXDUMP = 32,
 	FRAGMENTED = 64,
 	NO_FREE = 128,
-	MODE_LIST = 256
+	MODE_LIST = 256,
+	LAZY_ALIGN = 512,
+	NO_UNMAP = 1024
 }							t_mah_flags;
 
 /*
@@ -145,25 +121,25 @@ typedef enum				e_mah_flags
 ** header_size is used as pool size in LIST mode
 */
 
-typedef struct						s_ma_type_data
+typedef struct				s_ma_type_data
 {
-	size_t							bloc_size;
-	size_t							blocs_per_page;
-	size_t							pages_per_header;
-	size_t							header_size;
-	size_t							largest_size;
-}									t_ma_type_data;
+	size_t					bloc_size;
+	size_t					blocs_per_page;
+	size_t					pages_per_header;
+	size_t					header_size;
+	size_t					largest_size;
+}							t_ma_type_data;
 
 /*
 ** collection of pointers to function used to switch between bloc and list mode
 */
 
-typedef struct						s_ma_func
+typedef struct				s_ma_func
 {
-	void						*(*new_head)(t_ma_type_data);
-	void						*(*get_space)(size_t, t_ma_type_data, void**);
-	void						*(*search_pointer)(const size_t, int*, size_t*);
-}									t_ma_func;
+	void					*(*new_head)(t_ma_type_data);
+	void					*(*get_space)(size_t, t_ma_type_data, void**);
+	void					*(*search_pointer)(const size_t, int*, size_t*);
+}							t_ma_func;
 
 /*
 ** flags: see t_mah_flags definition above, default SCRIBBLE
@@ -176,33 +152,33 @@ typedef struct						s_ma_func
 ** large: pointer to the first zone of large blocs, default NULL
 */
 
-struct								s_ma_handler
+struct						s_ma_handler
 {
-	t_mah_flags						flags;
-	t_ma_type_data					tiny_td;
-	t_ma_type_data					small_td;
-	size_t							page_size;
-	size_t							guard_edges;
-	char							scribble;
-	t_ma_header_small_tiny			*tiny;
-	t_ma_header_small_tiny			*small;
-	t_ma_header_large				*large;
-	t_ma_func						func;
+	t_mah_flags				flags;
+	t_ma_type_data			tiny_td;
+	t_ma_type_data			small_td;
+	size_t					page_size;
+	size_t					guard_edges;
+	char					scribble;
+	void					*tiny;
+	void					*small;
+	t_ma_header_link		*large;
+	t_ma_func				func;
 };
 
-extern struct s_ma_handler			g_ma_handler;
+extern struct s_ma_handler	g_ma_handler;
 
-int									malloc_init(void);
-void								*ma_search_pointer_bloc(const size_t ptr,
-												int *type, size_t *index);
-void								*ma_search_pointer_list(const size_t ptr,
-												int *type, size_t *index);
-void								*ma_new_page_tiny(size_t *index);
-void								*ma_new_page_small(size_t *index);
-void								*ma_new_head_list(t_ma_type_data td);
-void								*ma_new_head_bloc(t_ma_type_data td);
-void								*ma_get_space_bloc(size_t size,
-											t_ma_type_data td, void **head);
-void								*ma_get_space_list(size_t size,
-											t_ma_type_data td, void **head);
+int							malloc_init(void);
+void						*ma_search_pointer_bloc(const size_t ptr,
+										int *type, size_t *index);
+void						*ma_search_pointer_list(const size_t ptr,
+										int *type, size_t *index);
+void						*ma_new_page(t_ma_header_bloc **head,
+								const t_ma_type_data td, size_t *index);
+void						*ma_new_head_list(t_ma_type_data td);
+void						*ma_new_head_bloc(t_ma_type_data td);
+void						*ma_get_space_bloc(size_t size,
+									t_ma_type_data td, void **head);
+void						*ma_get_space_list(size_t size,
+									t_ma_type_data td, void **head);
 #endif
