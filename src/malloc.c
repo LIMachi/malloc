@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 18:54:57 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/13 06:43:25 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/20 03:00:21 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,24 @@
 ** int close(int fd)
 */
 
+static inline int	sif_classify_size(size_t size)
+{
+	if (size <= g_ma_handler.tiny_td.largest_size)
+		return (TINY);
+	if (size <= g_ma_handler.small_td.largest_size)
+		return (SMALL);
+	return (LARGE);
+}
+
+static inline void	*sif_malloc_large(size_t size)
+{
+	(void)size;
+	return (NULL);
+}
+
 #if BONUS
 
-void	*malloc(size_t size)
+void				*malloc(size_t size)
 {
 	void	*ptr_out;
 
@@ -45,15 +60,44 @@ void	*malloc(size_t size)
 
 #else
 
-void	*malloc(size_t size)
+void				*malloc(size_t size)
 {
-	size_t	nb_blocs;
 	int		type;
+	size_t	index;
+	void	*ptr;
+	void	*h;
 
-	if (malloc_init() || size == 0)
+	if (malloc_init(0) || size == 0)
 		return (NULL);
-	(void)type;
-	(void)nb_blocs;
+	printf("call to malloc with size: %zi\n", size);
+	if ((type = sif_classify_size(size)) == TINY)
+	{
+		if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.tiny_td, g_ma_handler.tiny)) == NULL)
+			if ((h = g_ma_handler.func.new_space(g_ma_handler.tiny, g_ma_handler.tiny_td, &index)) == NULL)
+				return (NULL);
+			else
+				if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.tiny_td, &h)) == NULL)
+					return (NULL);
+				else
+					return (ptr);
+		else
+			return (ptr);
+	}
+	if (type == SMALL)
+	{
+		if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.small_td, g_ma_handler.small)) == NULL)
+			if ((h = g_ma_handler.func.new_space(g_ma_handler.small, g_ma_handler.small_td, &index)) == NULL)
+				return (NULL);
+			else
+				if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.small_td, &h)) == NULL)
+					return (NULL);
+				else
+					return (ptr);
+		else
+			return (ptr);
+	}
+	if (type == LARGE)
+		return (sif_malloc_large(size));
 	return (NULL);
 }
 

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/09 21:20:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/19 05:02:43 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/19 20:47:24 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,23 +46,21 @@ static inline size_t				sif_search_bloc(t_ma_header_bloc **h,
 		*h = (*h)->next;
 	}
 	if (*h == NULL)
-		return ((size_t)-1);
+		return (INVALID_POINTER);
 	blocs = (uint16_t*)&(*h)->pages[td.pages_per_header];
 	bloc = ((size_t)(*h)->pages[index] - ptr) / td.bloc_size;
 	if (!(id = blocs[index * td.blocs_per_page + bloc]))
-		index = -2;
+		index = FREED_POINTER;
 	return (!(g_ma_handler.flags & LAZY_ALIGN) && ((((size_t)(*h)->pages[index]
 		- ptr) % td.bloc_size) || (bloc > 0 && id == blocs[
-		index * td.blocs_per_page + bloc - 1])) ? (size_t)-3 : index);
+		index * td.blocs_per_page + bloc - 1])) ? BAD_ALIGN : index);
 }
 
 static inline void				*sif_search_list(const size_t ptr,
-													size_t *index)
+											t_ma_header_link *h, size_t *index)
 {
-	t_ma_header_link	*h;
 	size_t				p;
 
-	h = g_ma_handler.large;
 	*index = 0;
 	while (h != NULL)
 	{
@@ -70,16 +68,16 @@ static inline void				*sif_search_list(const size_t ptr,
 		if (p <= ptr && ptr < p + h->size)
 		{
 			if (!(h->size & USED))
-				*index = -2;
+				*index = FREED_POINTER;
 			if (!(g_ma_handler.flags & LAZY_ALIGN) && p != ptr)
-				*index = -3;
+				*index = BAD_ALIGN;
 			if ((ssize_t)*index < 0)
 				return (NULL);
 			return (h);
 		}
 		h = h->next;
 	}
-	*index = -1;
+	*index = INVALID_POINTER;
 	return (NULL);
 }
 
@@ -101,21 +99,21 @@ void								*ma_search_pointer_bloc(const size_t ptr,
 	t_ma_header_bloc	*h;
 
 	h = g_ma_handler.tiny;
-	*type = 1;
+	*type = TINY;
 	if ((ssize_t)(*index = sif_search_bloc(&h, ptr, g_ma_handler.tiny_td, 0))
 			< 0)
 		return (NULL);
 	if (h == NULL)
 	{
 		h = g_ma_handler.small;
-		*type = 2;
+		*type = SMALL;
 		if ((ssize_t)(*index = sif_search_bloc(&h, ptr, g_ma_handler.small_td,
 				0)) < 0)
 			return (NULL);
 		if (h == NULL)
 		{
-			*type = 3;
-			return (sif_search_list(ptr, index));
+			*type = LARGE;
+			return (sif_search_list(ptr, g_ma_handler.large, index));
 		}
 	}
 	return ((void*)h);
@@ -130,8 +128,27 @@ void								*ma_search_pointer_list(const size_t ptr,
 												int *type,
 												size_t *index)
 {
-	(void)ptr;
-	(void)type;
-	(void)index;
-	return (NULL);
+	t_ma_header_link	*h;
+	void				*p;
+
+	h = (t_ma_header_link*)g_ma_handler.tiny;
+	*type = TINY;
+	while (h != NULL)
+	{
+		if ((p = sif_search_list(ptr, (t_ma_header_link*)h->data, index)) !=
+				NULL || (ssize_t)*index < (ssize_t)INVALID_POINTER)
+			return (p);
+		h = h->next;
+	}
+	h = (t_ma_header_link*)g_ma_handler.small;
+	*type = SMALL;
+	while (h != NULL)
+	{
+		if ((p = sif_search_list(ptr, (t_ma_header_link*)h->data, index)) !=
+				NULL || (ssize_t)*index < (ssize_t)INVALID_POINTER)
+			return (p);
+		h = h->next;
+	}
+	*type = LARGE;
+	return (sif_search_list(ptr, g_ma_handler.large, index));
 }

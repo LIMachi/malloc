@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/19 04:13:00 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/20 02:48:16 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ struct s_ma_handler	g_ma_handler = {
 	.small = NULL,
 	.large = NULL,
 	.func = {
-		.new_head = NULL,
+		.new_space = NULL,
 		.get_space = NULL,
 		.search_pointer = NULL
 	}
@@ -135,7 +135,7 @@ static inline void	sif_load_env(struct s_ma_handler *h)
 		h->flags |= MODE_LIST * (MA_MODE_DEFAULT == MA_MODE_LIST);
 }
 
-inline int			malloc_init(void)
+inline int			malloc_init(size_t index)
 {
 	if (g_ma_handler.flags & INITIALIZED)
 		return (0);
@@ -147,25 +147,26 @@ inline int			malloc_init(void)
 	sf_calc_sizes(g_ma_handler.page_size, SMALL_EXPONENT_MULTIPLIER, 1.0,
 		&g_ma_handler.small_td);
 	if (g_ma_handler.flags & MODE_LIST)
-		g_ma_handler.func = (t_ma_func){.new_head = &ma_new_head_list,
+		g_ma_handler.func = (t_ma_func){.new_space = &ma_new_head_list,
 			.get_space = &ma_get_space_list,
 			.search_pointer = &ma_search_pointer_list};
 	else
-		g_ma_handler.func = (t_ma_func){.new_head = &ma_new_head_bloc,
+		g_ma_handler.func = (t_ma_func){.new_space = g_ma_handler.flags &
+			LAZY_ALIGN ? &ma_new_head_bloc : &ma_new_page,
 			.get_space = &ma_get_space_bloc,
 			.search_pointer = &ma_search_pointer_bloc};
-	if ((g_ma_handler.tiny = g_ma_handler.func.new_head(
-			g_ma_handler.tiny_td)) == NULL)
+	if ((g_ma_handler.tiny = g_ma_handler.func.new_space(&g_ma_handler.tiny,
+			g_ma_handler.tiny_td, &index)) == NULL)
 		return (-1);
-	if ((g_ma_handler.small = g_ma_handler.func.new_head(
-			g_ma_handler.small_td)) == NULL)
+	if ((g_ma_handler.small = g_ma_handler.func.new_space(&g_ma_handler.small,
+			g_ma_handler.small_td, &index)) == NULL)
 		return (-1);
 	return (0);
 }
 
 #else
 
-inline int			malloc_init(void)
+inline int			malloc_init(size_t index)
 {
 	if (g_ma_handler.flags & INITIALIZED)
 		return (0);
@@ -177,18 +178,19 @@ inline int			malloc_init(void)
 	sf_calc_sizes(g_ma_handler.page_size, SMALL_EXPONENT_MULTIPLIER, 1.0,
 		&g_ma_handler.small_td);
 	if (g_ma_handler.flags & MODE_LIST)
-		g_ma_handler.func = (t_ma_func){.new_head = &ma_new_head_list,
+		g_ma_handler.func = (t_ma_func){.new_space = &ma_new_head_list,
 			.get_space = &ma_get_space_list,
 			.search_pointer = &ma_search_pointer_list};
 	else
-		g_ma_handler.func = (t_ma_func){.new_head = &ma_new_head_bloc,
+		g_ma_handler.func = (t_ma_func){.new_space = g_ma_handler.flags &
+			LAZY_ALIGN ? &ma_new_head_bloc : &ma_new_page,
 			.get_space = &ma_get_space_bloc,
 			.search_pointer = &ma_search_pointer_bloc};
-	if ((g_ma_handler.tiny = g_ma_handler.func.new_head(
-			g_ma_handler.tiny_td)) == NULL)
+	if ((g_ma_handler.tiny = g_ma_handler.func.new_space(&g_ma_handler.tiny,
+			g_ma_handler.tiny_td, &index)) == NULL)
 		return (-1);
-	if ((g_ma_handler.small = g_ma_handler.func.new_head(
-			g_ma_handler.small_td)) == NULL)
+	if ((g_ma_handler.small = g_ma_handler.func.new_space(&g_ma_handler.small,
+			g_ma_handler.small_td, &index)) == NULL)
 		return (-1);
 	return (0);
 }

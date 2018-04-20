@@ -6,14 +6,14 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/19 04:15:27 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/20 02:51:25 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MALLOC_INTERNAL_H
 # define MALLOC_INTERNAL_H
 
-# include <malloc.h>
+# include "malloc.h"
 
 # ifndef BONUS
 #  define BONUS				0
@@ -136,8 +136,8 @@ typedef struct				s_ma_type_data
 
 typedef struct				s_ma_func
 {
-	void					*(*new_head)(t_ma_type_data);
-	void					*(*get_space)(size_t, t_ma_type_data, void**);
+	void					*(*new_space)(void **, const t_ma_type_data, size_t *);
+	void					*(*get_space)(size_t, const t_ma_type_data, void**);
 	void					*(*search_pointer)(const size_t, int*, size_t*);
 }							t_ma_func;
 
@@ -168,15 +168,20 @@ struct						s_ma_handler
 
 extern struct s_ma_handler	g_ma_handler;
 
-int							malloc_init(void);
+int							malloc_init(size_t index);
+
 void						*ma_search_pointer_bloc(const size_t ptr,
 										int *type, size_t *index);
 void						*ma_search_pointer_list(const size_t ptr,
 										int *type, size_t *index);
-void						*ma_new_page(t_ma_header_bloc **head,
+
+void						*ma_new_page(void **head,
 								const t_ma_type_data td, size_t *index);
-void						*ma_new_head_list(t_ma_type_data td);
-void						*ma_new_head_bloc(t_ma_type_data td);
+void						*ma_new_head_list(void **head,
+								const t_ma_type_data td, size_t *index);
+void						*ma_new_head_bloc(void **head,
+								const t_ma_type_data td, size_t *index);
+
 void						*ma_get_space_bloc(size_t size,
 									t_ma_type_data td, void **head);
 void						*ma_get_space_list(size_t size,
