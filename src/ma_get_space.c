@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:02:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/22 18:24:52 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 18:47:15 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,23 +18,24 @@
 ** uint16_t
 */
 
-static inline uint16_t	sif_get_new_id(void **head, t_ma_type_data td)
+static inline uint16_t	sif_get_new_id(t_ma_header_bloc *head, t_ma_type_data td)
 {
 	size_t		page;
 	size_t		bloc;
 	uint8_t		tmp[1 << 16];
 	uint16_t	id;
+	uint16_t	*blocs;
 
 	id = 0;
+	blocs = (uint16_t*)&head->pages[td.pages_per_header];
 	tmp[0] = 0;
 	while (++id != 0)
 		tmp[id] = 0;
 	page = -1;
 	while (++page < td.pages_per_header)
-		if (head[2 + page] != NULL && (bloc = -1))
+		if (head->pages[page] != NULL && (bloc = -1))
 			while (++bloc < td.blocs_per_page)
-				tmp[((uint16_t*)&head[2 + td.pages_per_header])
-					[page * td.blocs_per_page + bloc]] = 1;
+				tmp[blocs[page * td.blocs_per_page + bloc]] = 1;
 	id = 0;
 	while (++id != 0)
 		if (tmp[id] == 0)
@@ -42,25 +43,29 @@ static inline uint16_t	sif_get_new_id(void **head, t_ma_type_data td)
 	return (0);
 }
 
-static inline void		*sif_get_space(size_t nb_blocs, t_ma_type_data td,
-										void **head, size_t st[2])
+static inline void		*sif_get_space(size_t size, t_ma_type_data td,
+										t_ma_header_bloc *head, size_t st[2])
 {
 	uint16_t	tmp;
 	size_t		contiguous_blocs;
+	uint16_t	*blocs;
+	size_t		nb_blocs;
 
+	nb_blocs = 0;
+	while (nb_blocs * td.bloc_size < size)
+		++nb_blocs;
 	contiguous_blocs = 0;
+	blocs = (uint16_t*)&head->pages[td.pages_per_header];
 	if (st[1] < td.blocs_per_page)
 		while (contiguous_blocs < nb_blocs &&
 				contiguous_blocs + st[1] < td.blocs_per_page &&
-				!(((uint16_t*)&head[2 + td.pages_per_header])
-					[st[0] * td.blocs_per_page + st[1] + contiguous_blocs]))
+				!(blocs[st[0] * td.blocs_per_page + st[1] + contiguous_blocs]))
 			++contiguous_blocs;
 	if (contiguous_blocs == nb_blocs && (tmp = sif_get_new_id(head, td)))
 	{
 		while (contiguous_blocs--)
-			((uint16_t*)&head[2 + td.pages_per_header])
-				[st[0] * td.blocs_per_page + st[1] + contiguous_blocs] = tmp;
-		return ((void*)(((char*)head[2 + st[0]]) + st[1] * td.bloc_size));
+			blocs[st[0] * td.blocs_per_page + st[1] + contiguous_blocs] = tmp;
+		return ((void*)(((char*)head->pages[st[0]]) + st[1] * td.bloc_size));
 	}
 	return (NULL);
 }
@@ -71,43 +76,35 @@ static inline void		*sif_get_space(size_t nb_blocs, t_ma_type_data td,
 ** new pages)
 */
 
-static inline size_t	sif_size_in_blocs(size_t size, t_ma_type_data td)
-{
-	size_t	blocs;
-
-	blocs = 0;
-	while (blocs * td.bloc_size < size)
-		++blocs;
-	return (blocs);
-}
-
 void					*ma_get_space_bloc(size_t size, t_ma_type_data td,
 										void **head)
 {
-	size_t		page;
-	size_t		first_bloc;
-	void		*tmp;
+	size_t				page;
+	size_t				first_bloc;
+	void				*tmp;
+	t_ma_header_bloc	*h;
+	uint16_t			*blocs;
 
 	write(1, "get_space_bloc\n", 15); //DEBUG
-	while (head != NULL && (page = -1))
+	h = (t_ma_header_bloc*)*head;
+	while (h != NULL && (page = -1))
 	{
 		while (++page < td.pages_per_header && (first_bloc = -1))
 		{
-			if (head[2 + page] == NULL)
+			if (h->pages[page] == NULL)
 				continue ;
 			first_bloc = 0;
 			while (first_bloc < td.blocs_per_page)
 			{
-				while (first_bloc < td.blocs_per_page &&
-						((uint16_t*)&head[2 + td.pages_per_header])
-							[page * td.blocs_per_page + first_bloc])
+				blocs = (uint16_t*)&h->pages[td.pages_per_header];
+				while (first_bloc < td.blocs_per_page && blocs[page * td.blocs_per_page + first_bloc])
 					++first_bloc;
-				if ((tmp = sif_get_space(sif_size_in_blocs(size, td), td, head,
+				if ((tmp = sif_get_space(size, td, h,
 						(size_t[2]){page, first_bloc})) != NULL)
 					return (tmp);
 			}
 		}
-		head = (void**)((t_ma_header_bloc*)head)->next;
+		h = h->next;
 	}
 	return (NULL);
 }
