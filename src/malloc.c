@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 18:54:57 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/20 03:00:21 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 17:44:06 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,20 +47,52 @@ static inline void	*sif_malloc_large(size_t size)
 
 #if BONUS
 
-void				*malloc(size_t size)
+void				*ft_malloc(size_t size)
 {
-	void	*ptr_out;
+	int		type;
+	size_t	index;
+	void	*ptr;
+	void	*h;
 
 	pthread_mutex_lock(&g_ma_mutex);
-	(void)size;
-	ptr_out = NULL;
+	if (malloc_init(0) || size == 0)
+		return (NULL);
+	if ((type = sif_classify_size(size)) == TINY)
+	{
+		if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.tiny_td, g_ma_handler.tiny)) == NULL)
+			if ((h = g_ma_handler.func.new_space(g_ma_handler.tiny, g_ma_handler.tiny_td, &index)) == NULL)
+				return (NULL);
+			else
+				if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.tiny_td, &h)) == NULL)
+					return (NULL);
+				else
+					return (ptr);
+		else
+			return (ptr);
+	}
+	if (type == SMALL)
+	{
+		if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.small_td, g_ma_handler.small)) == NULL)
+			if ((h = g_ma_handler.func.new_space(g_ma_handler.small, g_ma_handler.small_td, &index)) == NULL)
+				return (NULL);
+			else
+				if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.small_td, &h)) == NULL)
+					return (NULL);
+				else
+					return (ptr);
+		else
+			return (ptr);
+	}
+	if (type == LARGE)
+		return (sif_malloc_large(size));
+	return (NULL);
 	pthread_mutex_unlock(&g_ma_mutex);
-	return (ptr_out);
+	return (ptr);
 }
 
 #else
 
-void				*malloc(size_t size)
+void				*ft_malloc(size_t size)
 {
 	int		type;
 	size_t	index;
@@ -69,7 +101,6 @@ void				*malloc(size_t size)
 
 	if (malloc_init(0) || size == 0)
 		return (NULL);
-	printf("call to malloc with size: %zi\n", size);
 	if ((type = sif_classify_size(size)) == TINY)
 	{
 		if ((ptr = g_ma_handler.func.get_space(size, g_ma_handler.tiny_td, g_ma_handler.tiny)) == NULL)
@@ -102,3 +133,8 @@ void				*malloc(size_t size)
 }
 
 #endif
+
+void				*malloc(size_t size)
+{
+	return (ft_malloc(size));
+}

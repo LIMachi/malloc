@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/20 02:51:25 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 16:28:45 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@
 # ifndef BONUS
 #  define BONUS				0
 # endif
+
+# include <unistd.h> //DEBUG
+# include <stdio.h> //DEBUG
 
 # if BONUS
 
@@ -75,7 +78,7 @@ typedef struct				s_ma_header_bloc
 	void					*pages[0];
 }							t_ma_header_bloc;
 
-# define _																		//FIXME: not norm compliant
+# define _											//FIXME: not norm compliant
 
 /*
 ** UNINITIALIZED: default state
@@ -136,9 +139,9 @@ typedef struct				s_ma_type_data
 
 typedef struct				s_ma_func
 {
-	void					*(*new_space)(void **, const t_ma_type_data, size_t *);
-	void					*(*get_space)(size_t, const t_ma_type_data, void**);
-	void					*(*search_pointer)(const size_t, int*, size_t*);
+	void				*(*new_space)(void **, const t_ma_type_data, size_t *);
+	void				*(*get_space)(size_t, const t_ma_type_data, void**);
+	void				*(*search_pointer)(const size_t, int*, size_t*);
 }							t_ma_func;
 
 /*

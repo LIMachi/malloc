@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:10:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/20 02:28:07 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 16:18:31 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,12 @@
 ** return the page_head and index in which the new page was inserted
 */
 
-void	*ma_new_page_bloc(void **head, const t_ma_type_data td,
+void	*ma_new_page(void **head, const t_ma_type_data td,
 					size_t *index)
 {
 	t_ma_header_bloc	*tmp;
 
+	write(1, "ma_new_page\n", 12);
 	tmp = *head;
 	while (tmp != NULL)
 	{

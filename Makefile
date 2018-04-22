@@ -6,7 +6,7 @@ ifeq ($(BONUS),)
 	BONUS := 0
 endif
 
-TIME := /usr/bin/time -v
+TIME := /usr/bin/time -l
 
 HNAME := libft_malloc_$(HOSTTYPE).so
 NAME := libft_malloc.so
@@ -21,7 +21,7 @@ OBJ :=	obj/malloc.o\
 		obj/ma_new_head.o\
 		obj/ma_get_space.o
 
-FLAGS := -Wall -Wextra -Werror -DBONUS=$(BONUS) -fPIC
+FLAGS := -Wall -Wextra -Werror -g -DBONUS=$(BONUS) -fPIC
 
 all: $(NAME)
 

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 13:16:47 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/20 02:36:22 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 17:53:00 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,13 @@ static inline void	*sif_attach_head(t_ma_header_bloc **head,
 									t_ma_header_bloc *tmp)
 {
 	tmp->next = *head;
-	tmp->prev = (*head)->prev;
-	(*head)->prev = tmp;
+	if (*head != NULL)
+	{
+		tmp->prev = (*head)->prev;
+		(*head)->prev = tmp;
+	}
+	else
+		tmp->prev = NULL;
 	return ((void*)(*head = tmp));
 }
 
@@ -43,6 +48,7 @@ void				*ma_new_head_bloc(void **head, const t_ma_type_data td,
 	size_t				i;
 	size_t				j;
 
+	write(1, "new_head_bloc\n", 14); //DEBUG
 	if ((tmp = (t_ma_header_bloc*)mmap(0, td.header_size +
 		td.pages_per_header * g_ma_handler.page_size, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
@@ -56,7 +62,7 @@ void				*ma_new_head_bloc(void **head, const t_ma_type_data td,
 		tmp->pages[i] = data + i * g_ma_handler.page_size;
 		j = -1;
 		while (++j < td.blocs_per_page)
-			blocs[i * td.pages_per_header + j] = 0;
+			blocs[i * td.blocs_per_page + j] = 0;
 	}
 	*index = 0;
 	return (sif_attach_head((t_ma_header_bloc**)head, tmp));
@@ -68,6 +74,7 @@ void				*ma_new_head_list(void **head, const t_ma_type_data td,
 	t_ma_header_link	*tmp;
 	t_ma_header_link	*link;
 
+	write(1, "new_head_list\n", 14); //DEBUG
 	if ((tmp = (t_ma_header_link*)mmap(0, td.header_size,
 		PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
 		return (NULL);
@@ -80,7 +87,12 @@ void				*ma_new_head_list(void **head, const t_ma_type_data td,
 		sizeof(t_ma_header_link));
 	*index = 0;
 	tmp->next = *head;
-	tmp->prev = ((t_ma_header_link*)*head)->prev;
-	((t_ma_header_link*)*head)->prev = tmp;
+	if (*head != NULL)
+	{
+		tmp->prev = ((t_ma_header_link*)*head)->prev;
+		((t_ma_header_link*)*head)->prev = tmp;
+	}
+	else
+		tmp->prev = NULL;
 	return ((void*)(*head = tmp));
 }

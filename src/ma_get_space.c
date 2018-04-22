@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:02:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/19 04:19:15 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 18:24:52 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,24 +22,22 @@ static inline uint16_t	sif_get_new_id(void **head, t_ma_type_data td)
 {
 	size_t		page;
 	size_t		bloc;
-	uint8_t		tmp[256];
+	uint8_t		tmp[1 << 16];
 	uint16_t	id;
 
-	id = -1;
-	while (++id < 256)
+	id = 0;
+	tmp[0] = 0;
+	while (++id != 0)
 		tmp[id] = 0;
 	page = -1;
 	while (++page < td.pages_per_header)
 		if (head[2 + page] != NULL && (bloc = -1))
 			while (++bloc < td.blocs_per_page)
-			{
-				id = ((uint16_t*)&head[2 + td.pages_per_header])
-					[page * td.blocs_per_page + bloc];
-				tmp[id >> 8] |= id & 255;
-			}
+				tmp[((uint16_t*)&head[2 + td.pages_per_header])
+					[page * td.blocs_per_page + bloc]] = 1;
 	id = 0;
 	while (++id != 0)
-		if (!(tmp[id >> 8] & (id & 255)))
+		if (tmp[id] == 0)
 			return (id);
 	return (0);
 }
@@ -90,6 +88,7 @@ void					*ma_get_space_bloc(size_t size, t_ma_type_data td,
 	size_t		first_bloc;
 	void		*tmp;
 
+	write(1, "get_space_bloc\n", 15); //DEBUG
 	while (head != NULL && (page = -1))
 	{
 		while (++page < td.pages_per_header && (first_bloc = -1))
@@ -119,6 +118,7 @@ void					*ma_get_space_list(size_t size, t_ma_type_data td,
 	t_ma_header_link	*link;
 	t_ma_header_link	*tmp;
 
+	write(1, "get_space_list\n", 15); //DEBUG
 	(void)td;
 	while (*head != NULL)
 	{

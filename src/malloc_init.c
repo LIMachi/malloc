@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/20 02:48:16 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 17:42:29 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@
 
 #endif
 
+pthread_mutex_t		g_ma_mutex;
+
 struct s_ma_handler	g_ma_handler = {
 	.flags = UNINITIALIZED,
 	.tiny_td = {
@@ -80,7 +82,7 @@ static void			sf_calc_sizes(size_t page_size, double exp_multiplier,
 	size_t	exponent;
 	size_t	tmp;
 
-	exponent = 1;
+	exponent = 0;
 	tmp = page_size;
 	while (tmp >>= 1)
 		++exponent;
@@ -140,12 +142,15 @@ inline int			malloc_init(size_t index)
 	if (g_ma_handler.flags & INITIALIZED)
 		return (0);
 	g_ma_handler.flags = (g_ma_handler.flags & ~UNINITIALIZED) | INITIALIZED;
+	write(1, "loadding flags\n", 15); //DEBUG
 	sif_load_env(&g_ma_handler);
+	write(1, "flags ok\n", 9); //DEBUG
 	g_ma_handler.page_size = (size_t)getpagesize();
 	sf_calc_sizes(g_ma_handler.page_size, TINY_EXPONENT_MULTIPLIER,
 		SMALL_EXPONENT_MULTIPLIER, &g_ma_handler.tiny_td);
 	sf_calc_sizes(g_ma_handler.page_size, SMALL_EXPONENT_MULTIPLIER, 1.0,
 		&g_ma_handler.small_td);
+	write(1, "sizes ok\n", 9); //DEBUG
 	if (g_ma_handler.flags & MODE_LIST)
 		g_ma_handler.func = (t_ma_func){.new_space = &ma_new_head_list,
 			.get_space = &ma_get_space_list,
@@ -155,12 +160,14 @@ inline int			malloc_init(size_t index)
 			LAZY_ALIGN ? &ma_new_head_bloc : &ma_new_page,
 			.get_space = &ma_get_space_bloc,
 			.search_pointer = &ma_search_pointer_bloc};
+	write(1, "preallocation\n", 14); //DEBUG
 	if ((g_ma_handler.tiny = g_ma_handler.func.new_space(&g_ma_handler.tiny,
 			g_ma_handler.tiny_td, &index)) == NULL)
 		return (-1);
 	if ((g_ma_handler.small = g_ma_handler.func.new_space(&g_ma_handler.small,
 			g_ma_handler.small_td, &index)) == NULL)
 		return (-1);
+	write(1, "init finished\n", 14); //DEBUG
 	return (0);
 }
 

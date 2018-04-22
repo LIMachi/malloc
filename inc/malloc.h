@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/03 13:05:58 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/20 02:51:36 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 17:27:11 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@
 void						free(void *ptr);
 void						*malloc(size_t size);
 void						*realloc(void *ptr, size_t size);
+
+void						*ft_malloc(size_t size); //DEBUG
 
 /*
 ** print the actually used memory zones of this library, the format can be

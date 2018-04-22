@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/09 21:20:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/19 20:47:24 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/22 16:26:25 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,14 @@
 ** uint16_t
 */
 
-static inline size_t				sif_search_bloc(t_ma_header_bloc **h,
-													const size_t ptr,
-													const t_ma_type_data td,
-													size_t index)
+static inline size_t	sif_search_bloc(t_ma_header_bloc **h, const size_t ptr,
+										const t_ma_type_data td, size_t index)
 {
 	size_t		bloc;
 	uint16_t	*blocs;
 	uint16_t	id;
 
+	write(1, "sif_search_bloc\n", 16); //DEBUG
 	while (*h != NULL && !(index = 0))
 	{
 		while (index < td.pages_per_header && (*h)->pages[index] != NULL &&
@@ -56,12 +55,13 @@ static inline size_t				sif_search_bloc(t_ma_header_bloc **h,
 		index * td.blocs_per_page + bloc - 1])) ? BAD_ALIGN : index);
 }
 
-static inline void				*sif_search_list(const size_t ptr,
-											t_ma_header_link *h, size_t *index)
+static inline void		*sif_search_list(const size_t ptr,
+										t_ma_header_link *h, size_t *index)
 {
 	size_t				p;
 
 	*index = 0;
+	write(1, "sif_search_list\n", 16); //DEBUG
 	while (h != NULL)
 	{
 		p = ((size_t)h) + sizeof(t_ma_header_link);
@@ -92,12 +92,12 @@ static inline void				*sif_search_list(const size_t ptr,
 ** equivalent to index == -1)
 */
 
-void								*ma_search_pointer_bloc(const size_t ptr,
-												int *type,
+void					*ma_search_pointer_bloc(const size_t ptr, int *type,
 												size_t *index)
 {
 	t_ma_header_bloc	*h;
 
+	write(1, "search_pointer_bloc\n", 20); //DEBUG
 	h = g_ma_handler.tiny;
 	*type = TINY;
 	if ((ssize_t)(*index = sif_search_bloc(&h, ptr, g_ma_handler.tiny_td, 0))
@@ -124,13 +124,13 @@ void								*ma_search_pointer_bloc(const size_t ptr,
 ** or NULL if no page contains it
 */
 
-void								*ma_search_pointer_list(const size_t ptr,
-												int *type,
+void					*ma_search_pointer_list(const size_t ptr, int *type,
 												size_t *index)
 {
 	t_ma_header_link	*h;
 	void				*p;
 
+	write(1, "search_pointer_list\n", 20); //DEBUG
 	h = (t_ma_header_link*)g_ma_handler.tiny;
 	*type = TINY;
 	while (h != NULL)
