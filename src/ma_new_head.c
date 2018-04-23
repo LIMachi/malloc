@@ -50,7 +50,7 @@ void				*ma_new_head_bloc(void **head, const t_ma_type_data td,
 
 	write(1, "new_head_bloc\n", 14); //DEBUG
 	if ((tmp = (t_ma_header_bloc*)mmap(0, td.header_size +
-		td.pages_per_header * g_ma_handler.page_size, PROT_READ | PROT_WRITE,
+		td.pages_per_header * ma_handler()->page_size, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
 		return (NULL);
 	tmp->prev = NULL;
@@ -59,7 +59,7 @@ void				*ma_new_head_bloc(void **head, const t_ma_type_data td,
 	data = (void*)(((size_t)tmp) + td.header_size);
 	while (++i < td.pages_per_header)
 	{
-		tmp->pages[i] = data + i * g_ma_handler.page_size;
+		tmp->pages[i] = data + i * ma_handler()->page_size;
 		j = -1;
 		while (++j < td.blocs_per_page)
 			blocs[i * td.blocs_per_page + j] = 0;

@@ -19,7 +19,10 @@ OBJ :=	obj/malloc.o\
 		obj/ma_search_pointer.o\
 		obj/ma_new_page.o\
 		obj/ma_new_head.o\
-		obj/ma_get_space.o
+		obj/ma_get_space.o\
+		obj/ma_handler.o\
+		obj/aggressive_munmap.o\
+		obj/calloc.o
 
 FLAGS := -Wall -Wextra -Werror -g -DBONUS=$(BONUS) -fPIC
 
@@ -116,3 +119,8 @@ test_show_alloc_mem: $(NAME)
 	cat test/test5.c
 	gcc -o test/test5 test/test5.c
 	test/test5
+
+test_this_is_madness: $(NAME)
+	clear
+	cat test/run.sh
+	test/run.sh /usr/bin/vi

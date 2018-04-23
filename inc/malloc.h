@@ -6,20 +6,20 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/03 13:05:58 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/22 17:27:11 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/23 03:56:13 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MALLOC_H
 # define MALLOC_H
 
-# include "malloc_defines.h"
-
 # include <stddef.h>
 
 /*
 ** typedef size_t
 */
+
+# include "malloc_defines.h"
 
 /*
 ** values for MA_MODE: MA_MODE_BLOC (use bloc allocation, information of
@@ -42,6 +42,17 @@
 void						free(void *ptr);
 void						*malloc(size_t size);
 void						*realloc(void *ptr, size_t size);
+
+/*
+** bonus
+*/
+
+void						*calloc(size_t nbmem, size_t size);
+void						*reallocf(void *ptr, size_t size);
+
+/*
+** debug/testing
+*/
 
 void						*ft_malloc(size_t size); //DEBUG
 

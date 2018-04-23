@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/22 16:28:45 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/23 04:20:54 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,9 @@ typedef struct				s_ma_header_bloc
 ** UNINITIALIZED: default state
 ** INITIALIZED: prevent reinitialisation
 ** SCRIBBLE: signal to free to scribble over the unallocated memory with the
-**   character g_ma_handler.scribble set by the env 'MALLOC_SCRIBBLE='
-** GUARD_EDGES: signal to alloc functions to add (g_ma_handler.guard_edges)
-**   bytes around allocated memory. g_ma_handler.guard_edges is set by the env
+**   character ma_handler()->scribble set by the env 'MALLOC_SCRIBBLE='
+** GUARD_EDGES: signal to alloc functions to add (ma_handler()->guard_edges)
+**   bytes around allocated memory. ma_handler()->guard_edges is set by the env
 **   'MALLOC_GUARD_EDGES='
 ** all following values are flags set by the env prefixing them with 'MALLOC_'
 ** example: to set ALLOC_LOG, add to env the entry 'MALLOC_ALLOC_LOG'
@@ -155,7 +155,7 @@ typedef struct				s_ma_func
 ** large: pointer to the first zone of large blocs, default NULL
 */
 
-struct						s_ma_handler
+typedef struct				s_ma_handler
 {
 	t_mah_flags				flags;
 	t_ma_type_data			tiny_td;
@@ -167,11 +167,21 @@ struct						s_ma_handler
 	void					*small;
 	t_ma_header_link		*large;
 	t_ma_func				func;
-};
+	size_t					pages_mapped;
+	size_t					pages_writen;
+}							t_ma_handler;
 
-extern struct s_ma_handler	g_ma_handler;
+// extern struct s_ma_handler	g_ma_handler;
+
+void						handler_container(void);
+
+t_ma_handler				*ma_handler(void);
 
 int							malloc_init(size_t index);
+
+// void						*calloc(size_t nbmem, size_t size);
+
+void						aggressive_munmap(void);
 
 void						*ma_search_pointer_bloc(const size_t ptr,
 										int *type, size_t *index);

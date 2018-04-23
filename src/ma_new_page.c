@@ -6,17 +6,16 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:10:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/22 16:18:31 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/23 04:16:54 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <malloc_internal.h>
+#include "malloc_internal.h"
 
 #include <sys/mman.h>
 
 /*
 ** void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
-** int munmap(void *addr, size_t len)
 */
 
 /*
@@ -40,7 +39,7 @@ void	*ma_new_page(void **head, const t_ma_type_data td,
 			++*index;
 		if (*index < td.pages_per_header)
 		{
-			((void**)tmp)[2 + *index] = mmap(0, g_ma_handler.page_size,
+			tmp->pages[*index] = mmap(0, ma_handler()->page_size,
 				PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 			return (tmp);
 		}

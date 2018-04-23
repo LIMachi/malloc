@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:02:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/22 18:47:15 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/23 04:18:40 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,15 +94,12 @@ void					*ma_get_space_bloc(size_t size, t_ma_type_data td,
 			if (h->pages[page] == NULL)
 				continue ;
 			first_bloc = 0;
-			while (first_bloc < td.blocs_per_page)
-			{
-				blocs = (uint16_t*)&h->pages[td.pages_per_header];
-				while (first_bloc < td.blocs_per_page && blocs[page * td.blocs_per_page + first_bloc])
-					++first_bloc;
-				if ((tmp = sif_get_space(size, td, h,
-						(size_t[2]){page, first_bloc})) != NULL)
-					return (tmp);
-			}
+			blocs = (uint16_t*)&h->pages[td.pages_per_header];
+			while (first_bloc < td.blocs_per_page && blocs[page * td.blocs_per_page + first_bloc])
+				++first_bloc;
+			if ((tmp = sif_get_space(size, td, h,
+					(size_t[2]){page, first_bloc})) != NULL)
+				return (tmp);
 		}
 		h = h->next;
 	}

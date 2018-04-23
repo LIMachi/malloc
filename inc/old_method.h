@@ -107,9 +107,9 @@ typedef S_MA_PAGE			t_ma_page;
 ** UNINITIALIZED: default state
 ** INITIALIZED: prevent reinitialisation
 ** SCRIBBLE: signal to free to scribble over the unallocated memory with the
-**   character g_ma_handler.scribble set by the env 'MALLOC_SCRIBBLE='
-** GUARD_EDGES: signal to alloc functions to add (g_ma_handler.guard_edges)
-**   bytes around allocated memory. g_ma_handler.guard_edges is set by the env
+**   character ma_handler()->scribble set by the env 'MALLOC_SCRIBBLE='
+** GUARD_EDGES: signal to alloc functions to add (ma_handler()->guard_edges)
+**   bytes around allocated memory. ma_handler()->guard_edges is set by the env
 **   'MALLOC_GUARD_EDGES='
 ** all following values are flags set by the env prefixing them with 'MALLOC_'
 ** example: to set ALLOC_LOG, add to env the entry 'MALLOC_ALLOC_LOG'

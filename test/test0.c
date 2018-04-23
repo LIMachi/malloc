@@ -6,9 +6,11 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 18:18:35 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/02 18:29:51 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/23 02:17:19 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "../inc/malloc.h"
 
 int main(void)
 {
