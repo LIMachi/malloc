@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/23 02:47:17 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/26 04:11:36 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,11 @@
 ** long long strtoll(const char *restrict str, char **restrict endptr, int base)
 */
 
-pthread_mutex_t		g_ma_mutex;
+pthread_mutex_t			g_ma_mutex;
 
 #endif
 
-static void			sf_calc_sizes(size_t page_size, double exp_multiplier,
+static void				sf_calc_sizes(size_t page_size, double exp_multiplier,
 							double next_exp_multiplier, t_ma_type_data *data)
 {
 	size_t	exponent;
@@ -79,10 +79,26 @@ static void			sf_calc_sizes(size_t page_size, double exp_multiplier,
 
 #if BONUS
 
-static inline void	sif_load_env(t_ma_handler *h)
+static inline void		sif_load_env_2(t_ma_handler *h)
+{
+	if (NULL != getenv("MALLOC_NO_UNMAP"))
+		h->flags |= NO_UNMAP;
+	if (NULL != getenv("MALLOC_EXIT_ON_ERROR"))
+		h->flags |= EXIT_ON_ERROR;
+	if (NULL != getenv("MALLOC_NO_FREE"))
+		h->flags |= NO_FREE;
+	if (NULL != getenv("MALLOC_FRAGMENTED"))
+		h->flags |= FRAGMENTED;
+}
+
+static inline size_t	sif_load_env(t_ma_handler *h)
 {
 	char	*v;
 
+	if (NULL != (v = getenv("MALLOC_LOG_FILE")) &&
+			(h->flags |= FILE_LOG))
+		if (-1 == (h->log_fd = open(v, O_WRONLY | O_CREAT | O_APPEND, 0500)))
+			return ((size_t)-2);
 	if (NULL != (v = getenv("MALLOC_SCRIBBLE")) && (h->flags |= SCRIBBLE))
 		h->scribble = (char)strtoll(v, NULL, 0);
 	if (NULL != (v = getenv("MALLOC_GUARD_EDGES")) && (h->flags |= GUARD_EDGES))
@@ -95,25 +111,22 @@ static inline void	sif_load_env(t_ma_handler *h)
 		h->flags |= LAZY_ALIGN;
 	if (NULL != getenv("MALLOC_HEXDUMP"))
 		h->flags |= HEXDUMP;
-	if (NULL != getenv("MALLOC_FRAGMENTED"))
-		h->flags |= FRAGMENTED;
-	if (NULL != getenv("MALLOC_NO_FREE"))
-		h->flags |= NO_FREE;
-	if (NULL != getenv("MALLOC_NO_UNMAP"))
-		h->flags |= NO_UNMAP;
 	if (NULL != (v = getenv("MALLOC_MODE")))
 		h->flags |= MODE_LIST * (!strcmp(v, "LIST") ||
 			(!strcmp(v, "DEFAULT") && MA_MODE_DEFAULT == MA_MODE_LIST));
 	else
 		h->flags |= MODE_LIST * (MA_MODE_DEFAULT == MA_MODE_LIST);
+	sif_load_env_2(h);
+	return (0);
 }
 
-int					malloc_init(size_t index)
+int						malloc_init(size_t index)
 {
 	if (ma_handler()->flags & INITIALIZED)
 		return (0);
 	ma_handler()->flags = (ma_handler()->flags & ~UNINITIALIZED) | INITIALIZED;
-	sif_load_env(ma_handler());
+	if ((index = sif_load_env(ma_handler())))
+		return (index);
 	ma_handler()->page_size = (size_t)getpagesize();
 	sf_calc_sizes(ma_handler()->page_size, TINY_EXPONENT_MULTIPLIER,
 		SMALL_EXPONENT_MULTIPLIER, &ma_handler()->tiny_td);
@@ -131,15 +144,13 @@ int					malloc_init(size_t index)
 	if ((ma_handler()->tiny = ma_handler()->func.new_space(&ma_handler()->tiny,
 			ma_handler()->tiny_td, &index)) == NULL)
 		return (-1);
-	if ((ma_handler()->small = ma_handler()->func.new_space(&ma_handler()->small,
-			ma_handler()->small_td, &index)) == NULL)
-		return (-1);
-	return (0);
+	return (((ma_handler()->small = ma_handler()->func.new_space(
+	&ma_handler()->small, ma_handler()->small_td, &index)) == NULL) ? -1 : 0);
 }
 
 #else
 
-int					malloc_init(size_t index)
+int						malloc_init(size_t index)
 {
 	if (ma_handler()->flags & INITIALIZED)
 		return (0);

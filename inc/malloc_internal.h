@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 01:56:32 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/23 04:20:54 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/04/26 03:59:29 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,18 +101,20 @@ typedef struct				s_ma_header_bloc
 
 typedef enum				e_mah_flags
 {
-	UNINITIALIZED = 0,
-	INITIALIZED = 1,
-	SCRIBBLE = 2,
-	GUARD_EDGES = 4,
-	ALLOC_LOG = 8,
-	FREE_LOG = 16,
-	HEXDUMP = 32,
-	FRAGMENTED = 64,
-	NO_FREE = 128,
-	MODE_LIST = 256,
-	LAZY_ALIGN = 512,
-	NO_UNMAP = 1024
+	UNINITIALIZED =			0,
+	INITIALIZED =			1 << 0,
+	SCRIBBLE =				1 << 1,
+	GUARD_EDGES =			1 << 2,
+	ALLOC_LOG =				1 << 3,
+	FREE_LOG =				1 << 4,
+	HEXDUMP =				1 << 5,
+	FRAGMENTED =			1 << 6,
+	NO_FREE =				1 << 7,
+	MODE_LIST =				1 << 8,
+	LAZY_ALIGN =			1 << 9,
+	NO_UNMAP =				1 << 10,
+	EXIT_ON_ERROR =			1 << 11,
+	FILE_LOG =				1 << 12
 }							t_mah_flags;
 
 /*
@@ -169,6 +171,7 @@ typedef struct				s_ma_handler
 	t_ma_func				func;
 	size_t					pages_mapped;
 	size_t					pages_writen;
+	int						log_fd;
 }							t_ma_handler;
 
 // extern struct s_ma_handler	g_ma_handler;
