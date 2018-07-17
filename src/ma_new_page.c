@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:10:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/23 04:16:54 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/17 21:18:43 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@ void	*ma_new_page(void **head, const t_ma_type_data td,
 	t_ma_header_bloc	*tmp;
 
 	write(1, "ma_new_page\n", 12);
-	tmp = *head;
+	if (head != NULL)
+		tmp = *head;
+	else
+		tmp = NULL;
 	while (tmp != NULL)
 	{
 		*index = 0;

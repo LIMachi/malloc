@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 13:16:47 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/22 17:53:00 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/17 21:21:59 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,19 @@
 static inline void	*sif_attach_head(t_ma_header_bloc **head,
 									t_ma_header_bloc *tmp)
 {
-	tmp->next = *head;
-	if (*head != NULL)
+	if (head != NULL)
 	{
-		tmp->prev = (*head)->prev;
-		(*head)->prev = tmp;
+		tmp->next = *head;
+		if (*head != NULL)
+		{
+			tmp->prev = (*head)->prev;
+			(*head)->prev = tmp;
+		}
+		else
+			tmp->prev = NULL;
+		return ((void*)(*head = tmp));
 	}
-	else
-		tmp->prev = NULL;
-	return ((void*)(*head = tmp));
+	return (tmp);
 }
 
 void				*ma_new_head_bloc(void **head, const t_ma_type_data td,
@@ -75,6 +79,8 @@ void				*ma_new_head_list(void **head, const t_ma_type_data td,
 	t_ma_header_link	*link;
 
 	write(1, "new_head_list\n", 14); //DEBUG
+	if (head == NULL)
+		head = (void **)(size_t[1]){0};
 	if ((tmp = (t_ma_header_link*)mmap(0, td.header_size,
 		PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
 		return (NULL);

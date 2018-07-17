@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/12 15:02:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/23 04:18:40 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/17 21:13:31 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,8 @@ void					*ma_get_space_bloc(size_t size, t_ma_type_data td,
 	uint16_t			*blocs;
 
 	write(1, "get_space_bloc\n", 15); //DEBUG
+	if (head == NULL)
+		return (NULL);
 	h = (t_ma_header_bloc*)*head;
 	while (h != NULL && (page = -1))
 	{
@@ -113,6 +115,8 @@ void					*ma_get_space_list(size_t size, t_ma_type_data td,
 	t_ma_header_link	*tmp;
 
 	write(1, "get_space_list\n", 15); //DEBUG
+	if (head == NULL)
+		return (NULL);
 	(void)td;
 	while (*head != NULL)
 	{

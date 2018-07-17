@@ -6,7 +6,15 @@ ifeq ($(BONUS),)
 	BONUS := 0
 endif
 
+
+ifeq ($(shell uname), Linux)
+TIME := /usr/bin/time -v
+TEST_SH := test/run_linux.sh
+else
 TIME := /usr/bin/time -l
+TEST_SH := test/run_mac.sh
+endif
+
 
 HNAME := libft_malloc_$(HOSTTYPE).so
 NAME := libft_malloc.so
@@ -48,7 +56,7 @@ fclean: clean clean_tests
 re: fclean all
 
 clean_tests:
-	rm -f test/test0 test/test1 test/test2 test/test3 test/test3++ test/test4 test/test5
+	rm -f test/test0 test/test1 test/test2 test/test3 test/test3++ test/test4 test/test5 test/test6
 
 norm:
 	/Users/hmartzol/.bin/norminette.sh inc src
@@ -67,52 +75,52 @@ test_malloc_system:
 
 test_no_malloc_user: $(NAME)
 	clear
-	cat test/run.sh
+	cat $(TEST_SH)
 	cat test/test0.c
 	gcc -o test/test0 test/test0.c
-	test/run.sh $(TIME) test/test0
+	$(TEST_SH) $(TIME) test/test0
 
 test_malloc_user: $(NAME)
 	clear
-	cat test/run.sh
+	cat $(TEST_SH)
 	cat test/test1.c
 	gcc -o test/test1 test/test1.c
-	test/run.sh $(TIME) test/test1
+	$(TEST_SH) $(TIME) test/test1
 
 test_free_system:
 	clear
-	cat test/run.sh
+	cat $(TEST_SH)
 	cat test/test2.c
 	gcc -o test/test2 test/test2.c
 	$(TIME) test/test2
 
 test_free_user: $(NAME)
 	clear
-	cat test/run.sh
+	cat $(TEST_SH)
 	cat test/test2.c
 	gcc -o test/test2 test/test2.c
-	test/run.sh $(TIME) test/test2
+	$(TEST_SH) $(TIME) test/test2
 
 test_realloc_user: $(NAME)
 	clear
-	cat test/run.sh
+	cat $(TEST_SH)
 	cat test/test3.c
 	gcc -o test/test3 test/test3.c
-	test/run.sh test/test3
+	$(TEST_SH) test/test3
 
 test_realloc++: $(NAME)
 	clear
-	cat test/run.sh
+	cat $(TEST_SH)
 	cat test/test3++.c
 	gcc -o test/test3++ test/test3++.c
-	test/run.sh test/test3++
+	$(TEST_SH) test/test3++
 
 test_errors: $(NAME)
 	clear
-	cat test/run.sh
+	cat $(TEST_SH)
 	cat test/test4.c
 	gcc -o test/test4 test/test4.c
-	test/run.sh test/test4
+	$(TEST_SH) test/test4
 
 test_show_alloc_mem: $(NAME)
 	clear
@@ -122,5 +130,18 @@ test_show_alloc_mem: $(NAME)
 
 test_this_is_madness: $(NAME)
 	clear
-	cat test/run.sh
-	test/run.sh /usr/bin/vi
+	cat $(TEST_SH)
+	$(TEST_SH) /usr/bin/vi
+
+test_alternative_method_system: $(NAME)
+	clear
+	cat test/test6.c
+	gcc -o test/test6 test/test6.c
+	test/test6
+
+test_alternative_method_user: $(NAME)
+	clear
+	cat $(TEST_SH)
+	cat test/test6.c
+	gcc -o test/test6 test/test6.c
+	$(TEST_SH) test/test6

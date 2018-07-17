@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 15:08:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/26 04:11:36 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/17 21:09:19 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,11 +141,12 @@ int						malloc_init(size_t index)
 			LAZY_ALIGN ? &ma_new_head_bloc : &ma_new_page,
 			.get_space = &ma_get_space_bloc,
 			.search_pointer = &ma_search_pointer_bloc};
-	if ((ma_handler()->tiny = ma_handler()->func.new_space(&ma_handler()->tiny,
-			ma_handler()->tiny_td, &index)) == NULL)
-		return (-1);
-	return (((ma_handler()->small = ma_handler()->func.new_space(
-	&ma_handler()->small, ma_handler()->small_td, &index)) == NULL) ? -1 : 0);
+	// if ((ma_handler()->tiny = ma_handler()->func.new_space(&ma_handler()->tiny,
+	// 		ma_handler()->tiny_td, &index)) == NULL)
+	// 	return (-1);
+	// return (((ma_handler()->small = ma_handler()->func.new_space(
+	// &ma_handler()->small, ma_handler()->small_td, &index)) == NULL) ? -1 : 0);
+	return (0);
 }
 
 #else
@@ -154,6 +155,7 @@ int						malloc_init(size_t index)
 {
 	if (ma_handler()->flags & INITIALIZED)
 		return (0);
+	(void)index;
 	ma_handler()->flags = INITIALIZED |
 		MODE_LIST * (MA_MODE_DEFAULT == MA_MODE_LIST);
 	ma_handler()->page_size = (size_t)getpagesize();
@@ -170,12 +172,12 @@ int						malloc_init(size_t index)
 			LAZY_ALIGN ? &ma_new_head_bloc : &ma_new_page,
 			.get_space = &ma_get_space_bloc,
 			.search_pointer = &ma_search_pointer_bloc};
-	if ((ma_handler()->tiny = ma_handler()->func.new_space(&ma_handler()->tiny,
-			ma_handler()->tiny_td, &index)) == NULL)
-		return (-1);
-	if ((ma_handler()->small = ma_handler()->func.new_space(&ma_handler()->small,
-			ma_handler()->small_td, &index)) == NULL)
-		return (-1);
+	// if ((ma_handler()->tiny = ma_handler()->func.new_space(&ma_handler()->tiny,
+	// 		ma_handler()->tiny_td, &index)) == NULL)
+	// 	return (-1);
+	// if ((ma_handler()->small = ma_handler()->func.new_space(&ma_handler()->small,
+	// 		ma_handler()->small_td, &index)) == NULL)
+	// 	return (-1);
 	return (0);
 }
 

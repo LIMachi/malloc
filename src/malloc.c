@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/03/24 18:54:57 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/23 04:23:32 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/17 21:27:11 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@ void				*ft_malloc(size_t size)
 		return (NULL);
 	if ((type = sif_classify_size(size)) == TINY)
 	{
+		if (ma_handler()->tiny == NULL)
+			if ((ma_handler()->tiny = ma_handler()->func.new_space(&ma_handler()->tiny,
+					ma_handler()->tiny_td, &index)) == NULL)
+				return (NULL);
 		if ((ptr = ma_handler()->func.get_space(size, ma_handler()->tiny_td, ma_handler()->tiny)) == NULL)
 			if ((h = ma_handler()->func.new_space(ma_handler()->tiny, ma_handler()->tiny_td, &index)) == NULL)
 				return (NULL);
@@ -72,6 +76,10 @@ void				*ft_malloc(size_t size)
 	}
 	if (type == SMALL)
 	{
+		if (ma_handler()->small == NULL)
+			if ((ma_handler()->small = ma_handler()->func.new_space(&ma_handler()->small,
+					ma_handler()->small_td, &index)) == NULL)
+				return (NULL);
 		if ((ptr = ma_handler()->func.get_space(size, ma_handler()->small_td, ma_handler()->small)) == NULL)
 			if ((h = ma_handler()->func.new_space(ma_handler()->small, ma_handler()->small_td, &index)) == NULL)
 				return (NULL);
@@ -103,6 +111,10 @@ void				*ft_malloc(size_t size)
 		return (NULL);
 	if ((type = sif_classify_size(size)) == TINY)
 	{
+		if (ma_handler()->tiny == NULL)
+			if ((ma_handler()->tiny = ma_handler()->func.new_space(&ma_handler()->tiny,
+					ma_handler()->tiny_td, &index)) == NULL)
+				return (NULL);
 		if ((ptr = ma_handler()->func.get_space(size, ma_handler()->tiny_td, ma_handler()->tiny)) == NULL)
 			if ((h = ma_handler()->func.new_space(ma_handler()->tiny, ma_handler()->tiny_td, &index)) == NULL)
 				return (NULL);
@@ -116,6 +128,10 @@ void				*ft_malloc(size_t size)
 	}
 	if (type == SMALL)
 	{
+		if (ma_handler()->small == NULL)
+			if ((ma_handler()->small = ma_handler()->func.new_space(&ma_handler()->small,
+					ma_handler()->small_td, &index)) == NULL)
+				return (NULL);
 		if ((ptr = ma_handler()->func.get_space(size, ma_handler()->small_td, ma_handler()->small)) == NULL)
 			if ((h = ma_handler()->func.new_space(ma_handler()->small, ma_handler()->small_td, &index)) == NULL)
 				return (NULL);
