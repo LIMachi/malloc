@@ -1,30 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   malloc.c                                           :+:      :+:    :+:   */
+/*   realloc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/17 21:43:03 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/19 15:30:18 by hmartzol         ###   ########.fr       */
+/*   Created: 2018/03/24 19:13:00 by hmartzol          #+#    #+#             */
+/*   Updated: 2018/04/16 17:14:44 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 
-void	*malloc(size_t size)
-{
-	int			type;
-	t_ma_link	*l;
+/*
+** struct, global, prototype
+*/
 
-	if (!g_ma_holder.initialized)
-		ma_init();
-	type = ma_categorize(&size);
-	if ((l = ma_get_space(size, type)) == NULL)
-	{
-		if (ma_new_pool(size, type) == NULL)
-			return (NULL);
-		l = ma_get_space(size, type);
-	}
-	return (l->data);
+#include <sys/mman.h>
+
+/*
+** void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
+** int munmap(void *addr, size_t len)
+*/
+
+#include <unistd.h>
+
+/*
+** int getpagesize(void)
+*/
+
+void	*realloc(void *ptr, size_t size)
+{
+	if (ptr == NULL)
+		return (malloc(size));
+	return (NULL);
 }

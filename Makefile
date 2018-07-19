@@ -32,7 +32,7 @@ OBJ :=	obj/malloc.o\
 		obj/aggressive_munmap.o\
 		obj/calloc.o
 
-FLAGS := -Wall -Wextra -Werror -g -DBONUS=$(BONUS) -fPIC
+FLAGS := -Wall -Wextra -Werror -g -DBONUS=$(BONUS) -fPIC #-rdynamic
 
 all: $(NAME)
 
