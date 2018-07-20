@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 18:27:31 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/17 21:00:58 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/20 16:26:44 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,8 @@ int					main(void)
 		i = 0;
 		while (i < 1024)
 		{
-			write(1, buff, sif_itoa_buff(i, buff));
-			write(1, "\n", 1);
+			// write(1, buff, sif_itoa_buff(i, buff));
+			// write(1, "\n", 1);
 			addr = (char*)malloc(1024);
 			addr[0] = 42;
 			i++;

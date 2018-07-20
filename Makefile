@@ -20,19 +20,13 @@ HNAME := libft_malloc_$(HOSTTYPE).so
 NAME := libft_malloc.so
 
 OBJ :=	obj/malloc.o\
-		obj/realloc.o\
-		obj/free.o\
-		obj/malloc_init.o\
-		obj/show_alloc_mem.o\
-		obj/ma_search_pointer.o\
-		obj/ma_new_page.o\
-		obj/ma_new_head.o\
+		obj/init.o\
 		obj/ma_get_space.o\
-		obj/ma_handler.o\
-		obj/aggressive_munmap.o\
-		obj/calloc.o
+		obj/ma_new_pool.o\
+		obj/categorize.o\
+		obj/ma_debug_itoabuff.o
 
-FLAGS := -Wall -Wextra -Werror -g -DBONUS=$(BONUS) -fPIC #-rdynamic
+FLAGS := -Wall -Wextra -Werror -g -fPIC #-DBONUS=$(BONUS) -rdynamic
 
 all: $(NAME)
 

@@ -6,12 +6,14 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/19 15:11:21 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/20 17:50:11 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MALLOC_INTERNAL_H
 # define MALLOC_INTERNAL_H
+
+# define DEBUG
 
 # include <malloc.h>
 
@@ -86,51 +88,30 @@ pthread_mutex_t					g_ma_mutex;
 
 # endif
 
+# ifdef DEBUG
+typedef struct					s_ma_debug
+{
+	size_t						pool_count;
+	size_t						alloc_count;
+}								t_ma_debug;
+# endif
+
 typedef struct					s_ma_holder
 {
 	int							initialized;
 	size_t						page_size;
 	size_t						pool_size;
 	t_ma_type_data				td[3];
-	t_ma_header_link			*head[3];
+	t_ma_head					*head[3];
 # ifdef BONUS
 	t_ma_bonus					bonus;
 # endif
+# ifdef DEBUG
+	t_ma_debug					debug;
+# endif
 }								t_ma_holder;
 
-t_ma_holder						g_ma_holder = {
-	.initialized = 0,
-	.page_size = 0,
-	.pool_size = MA_DEFAULT_POOL_SIZE,
-	.td = {
-		{
-			.minimum_size = 0,
-			.maximum_size = 0,
-			.pool_size = 0,
-		},
-		{
-			.minimum_size = 0,
-			.maximum_size = 0,
-			.pool_size = 0,
-		},
-		{
-			.minimum_size = 0,
-			.maximum_size = 0,
-			.pool_size = 0,
-		}
-	},
-	.head = {NULL, NULL, NULL}
-# ifdef BONUS
-	, .bonus = {
-		.flags = 0,
-		.guard_edges = 0,
-		.scribble = '\0',
-		.pages_mapped = 0,
-		.pages_writen = 0,
-		.log_fd = -1
-	}
-# endif
-};
+t_ma_holder						g_ma_holder;
 
 /*
 ** void ma_init(void):	initialise elements of g_ma_holder
@@ -143,6 +124,24 @@ void							ma_init(void);
 ** 									size fit
 */
 
-int								ma_categorize(size_t *size);
+int								ma_categorize(size_t size);
+
+/*
+**
+*/
+
+t_ma_link						*ma_get_space(size_t nb, int type);
+
+/*
+**
+*/
+
+t_ma_head						*ma_new_pool(size_t size, int type);
+
+/*
+** DEBUG
+*/
+
+int								ma_debug_itoabuff(int i, char buff[42]);
 
 #endif

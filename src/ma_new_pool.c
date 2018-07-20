@@ -6,11 +6,13 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:12:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/19 15:15:21 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/20 17:50:57 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 /*
 ** create a new pool of the chosen type, prepare it and link it
@@ -19,8 +21,6 @@
 t_ma_head	*ma_new_pool(size_t size, int type)
 {
 	t_ma_head	*out;
-	t_ma_link	*link;
-	size_t		size;
 
 	if (type != MA_T_LARGE)
 		size = g_ma_holder.td[type].pool_size;

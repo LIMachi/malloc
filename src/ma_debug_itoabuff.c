@@ -1,22 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   categorize.c                                       :+:      :+:    :+:   */
+/*   ma_debug_itoabuff.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/17 23:01:01 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/20 16:17:17 by hmartzol         ###   ########.fr       */
+/*   Created: 2018/07/20 17:06:28 by hmartzol          #+#    #+#             */
+/*   Updated: 2018/07/20 17:06:56 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <malloc_internal.h>
-
-int	ma_categorize(size_t size)
+int	ma_debug_itoabuff(int i, char buff[42])
 {
-	if (size <= g_ma_holder.td[0].maximum_size)
-		return (MA_T_TINY);
-	if (size <= g_ma_holder.td[1].maximum_size)
-		return (MA_T_SMALL);
-	return (MA_T_LARGE);
+	int l;
+	int t;
+
+	l = 1;
+	t = i;
+	while (t /= 10)
+		++l;
+	t = l;
+	buff[l] = '\0';
+	while (t--)
+	{
+		buff[t] = i % 10 + '0';
+		i /= 10;
+	}
+	return (l);
 }

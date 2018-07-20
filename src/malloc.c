@@ -6,11 +6,12 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:03 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/19 15:30:18 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/20 17:51:20 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
+#include <unistd.h>
 
 void	*malloc(size_t size)
 {
@@ -19,7 +20,7 @@ void	*malloc(size_t size)
 
 	if (!g_ma_holder.initialized)
 		ma_init();
-	type = ma_categorize(&size);
+	type = ma_categorize(size);
 	if ((l = ma_get_space(size, type)) == NULL)
 	{
 		if (ma_new_pool(size, type) == NULL)

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:30:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/18 01:24:24 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/20 17:51:34 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,40 @@
 /*
 ** int getpagesize(void)
 */
+
+t_ma_holder						g_ma_holder = {
+	.initialized = 0,
+	.page_size = 0,
+	.pool_size = MA_DEFAULT_POOL_SIZE,
+	.td = {
+		{
+			.minimum_size = 0,
+			.maximum_size = 0,
+			.pool_size = 0,
+		},
+		{
+			.minimum_size = 0,
+			.maximum_size = 0,
+			.pool_size = 0,
+		},
+		{
+			.minimum_size = 0,
+			.maximum_size = 0,
+			.pool_size = 0,
+		}
+	},
+	.head = {NULL, NULL, NULL}
+# ifdef BONUS
+	, .bonus = {
+		.flags = 0,
+		.guard_edges = 0,
+		.scribble = '\0',
+		.pages_mapped = 0,
+		.pages_writen = 0,
+		.log_fd = -1
+	}
+# endif
+};
 
 #ifdef BONUS
 
@@ -93,12 +127,12 @@ void				ma_init(void)
 	g_ma_holder.td[1].maximum_size = 1 << 2 * (page_size_power / 3);
 	g_ma_holder.td[2].minimum_size = g_ma_holder.td[1].maximum_size;
 	g_ma_holder.td[2].maximum_size = (size_t)-1;
-	tmp = sizeof(t_ma_header_link) + g_ma_holder.pool_size *
-		(g_ma_holder.td[0].maximum_size + sizeof(t_ma_header_link));
+	tmp = sizeof(t_ma_head) + g_ma_holder.pool_size *
+		(g_ma_holder.td[0].maximum_size + sizeof(t_ma_link));
 	g_ma_holder.td[0].pool_size = (tmp / g_ma_holder.page_size +
 		!!(tmp % g_ma_holder.page_size)) * g_ma_holder.page_size;
-	tmp = sizeof(t_ma_header_link) + g_ma_holder.pool_size *
-		(g_ma_holder.td[1].maximum_size + sizeof(t_ma_header_link));
+	tmp = sizeof(t_ma_head) + g_ma_holder.pool_size *
+		(g_ma_holder.td[1].maximum_size + sizeof(t_ma_link));
 	g_ma_holder.td[1].pool_size = (tmp / g_ma_holder.page_size +
 		!!(tmp % g_ma_holder.page_size)) * g_ma_holder.page_size;
 	sif_bonus0(&g_ma_holder.bonus);
@@ -118,20 +152,33 @@ void 				ma_init(void)
 	page_size_power = 0;
 	while (tmp >>= 1)
 		++page_size_power;
-	g_ma_holder.td[0].maximum_size = 1 << (page_size_power / 3);
+	// char buff[42];
+	// write(1, "page size power: ", 17);
+	// write(1, buff, ma_debug_itoabuff(page_size_power, buff));
+	// write(1, "\n", 1);
+	g_ma_holder.td[0].maximum_size = 1 << (page_size_power / 2);
 	g_ma_holder.td[1].minimum_size = g_ma_holder.td[0].maximum_size;
-	g_ma_holder.td[1].maximum_size = 1 << 2 * (page_size_power / 3);
+	g_ma_holder.td[1].maximum_size = 1 << (page_size_power);
 	g_ma_holder.td[2].minimum_size = g_ma_holder.td[1].maximum_size;
 	g_ma_holder.td[2].maximum_size = (size_t)-1;
-	tmp = sizeof(t_ma_header_link) + g_ma_holder.pool_size *
-		(g_ma_holder.td[0].maximum_size + sizeof(t_ma_header_link));
+	tmp = sizeof(t_ma_head) + g_ma_holder.pool_size *
+		(g_ma_holder.td[0].maximum_size + sizeof(t_ma_link));
 	g_ma_holder.td[0].pool_size = (tmp / g_ma_holder.page_size +
 		!!(tmp % g_ma_holder.page_size)) * g_ma_holder.page_size;
-	tmp = sizeof(t_ma_header_link) + g_ma_holder.pool_size *
-		(g_ma_holder.td[1].maximum_size + sizeof(t_ma_header_link));
+	tmp = sizeof(t_ma_head) + g_ma_holder.pool_size *
+		(g_ma_holder.td[1].maximum_size + sizeof(t_ma_link));
 	g_ma_holder.td[1].pool_size = (tmp / g_ma_holder.page_size +
 		!!(tmp % g_ma_holder.page_size)) * g_ma_holder.page_size;
 	g_ma_holder.initialized = 1;
+	// write(1, "sizes: \npool tiny: ", 19);
+	// write(1, buff, ma_debug_itoabuff(g_ma_holder.td[0].pool_size, buff));
+	// write(1, "\npool small: ", 13);
+	// write(1, buff, ma_debug_itoabuff(g_ma_holder.td[1].pool_size, buff));
+	// write(1, "\nmax size tiny: ", 16);
+	// write(1, buff, ma_debug_itoabuff(g_ma_holder.td[0].maximum_size, buff));
+	// write(1, "\nmax size small: ", 17);
+	// write(1, buff, ma_debug_itoabuff(g_ma_holder.td[1].maximum_size, buff));
+	// write(1, "\n", 1);
 }
 
 #endif
