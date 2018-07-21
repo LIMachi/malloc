@@ -6,13 +6,13 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 19:49:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 20:05:09 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:20:09 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 
-void	ma_free(t_ma_found_link *f)
+MA_PRIVATE void	ma_free(t_ma_found_link *f)
 {
 	f->found->allocated = 0;
 	if (f->before != NULL && !f->before->allocated)
@@ -27,7 +27,7 @@ void	ma_free(t_ma_found_link *f)
 	}
 }
 
-void	free(void *ptr)
+MA_PUBLIC void	free(void *ptr)
 {
 	t_ma_found_link	f;
 

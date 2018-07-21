@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:12:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 15:07:29 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:21:33 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 ** create a new pool of the chosen type, prepare it and link it
 */
 
-t_ma_head	*ma_new_pool(size_t size, int type)
+MA_PRIVATE t_ma_head	*ma_new_pool(size_t size, int type)
 {
 	t_ma_head	*out;
 

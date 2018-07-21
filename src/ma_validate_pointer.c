@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 14:57:43 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 19:46:27 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:21:44 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static inline int	sif_validate_pointer(void *ptr, int type,
 	return (1);
 }
 
-int	ma_validate_pointer(void *ptr, t_ma_found_link *f)
+MA_PRIVATE int		ma_validate_pointer(void *ptr, t_ma_found_link *f)
 {
 	f->type = 0;
 	while (f->type < 3 && sif_validate_pointer(ptr, f->type, f))

@@ -1,27 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   reallocf.c                                         :+:      :+:    :+:   */
+/*   calloc.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/21 15:59:29 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 20:22:52 by hmartzol         ###   ########.fr       */
+/*   Created: 2018/07/21 20:33:02 by hmartzol          #+#    #+#             */
+/*   Updated: 2018/07/21 20:35:45 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 
-MA_PUBLIC void	*reallocf(void *ptr, size_t size)
+void	*calloc(size_t nmemb, size_t size)
 {
-	void	*out;
+	char	*out;
+	size_t	i;
 
-	if (size == 0)
-	{
-		free(ptr);
+	if (nmemb * size < size)
 		return (NULL);
-	}
-	if ((out = realloc(ptr, size)) == NULL)
-		free(ptr);
+	out = malloc(nmemb * size);
+	i = -1;
+	while (++i < nmemb * size)
+		out[i] = 0;
 	return (out);
 }

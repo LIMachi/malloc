@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:11:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 14:57:56 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:21:28 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static inline t_ma_link	*sif_cut(size_t nb, int type, t_ma_link *l,
 ** it as used or return NULL if no valid place was found
 */
 
-t_ma_link				*ma_get_space(size_t nb, int type)
+MA_PRIVATE t_ma_link	*ma_get_space(size_t nb, int type)
 {
 	t_ma_head	*h;
 	t_ma_link	*l;

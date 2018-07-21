@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:05:30 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 19:54:20 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:22:15 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ static inline void	*sif_realloc0(t_ma_found_link *f, size_t size)
 	return (sif_realloc1(f, size));
 }
 
-void				*realloc(void *ptr, size_t size)
+MA_PUBLIC void		*realloc(void *ptr, size_t size)
 {
 	t_ma_found_link	f;
 	int				type;

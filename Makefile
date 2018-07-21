@@ -29,7 +29,9 @@ OBJ :=	obj/malloc.o\
 		obj/reallocf.o\
 		obj/realloc.o\
 		obj/memcpy.o\
-		obj/free.o
+		obj/free.o\
+		obj/show_alloc_mem.o\
+		obj/calloc.o
 
 FLAGS := -Wall -Wextra -Werror -g -fPIC #-DBONUS=$(BONUS) -rdynamic
 

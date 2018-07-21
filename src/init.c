@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:30:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/20 17:51:34 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:21:03 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ static inline void	sif_bonus0(t_ma_bonus *b)
 		b->flags |= NO_UNMAP;
 }
 
-void				ma_init(void)
+MA_PRIVATE void		ma_init(void)
 {
 	size_t	page_size_power;
 	size_t	tmp;
@@ -142,7 +142,7 @@ void				ma_init(void)
 
 #else
 
-void 				ma_init(void)
+MA_PRIVATE void 	ma_init(void)
 {
 	size_t	page_size_power;
 	size_t	tmp;

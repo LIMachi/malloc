@@ -6,14 +6,14 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:03 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/20 17:51:20 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:21:51 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 #include <unistd.h>
 
-void	*malloc(size_t size)
+MA_PUBLIC void	*malloc(size_t size)
 {
 	int			type;
 	t_ma_link	*l;

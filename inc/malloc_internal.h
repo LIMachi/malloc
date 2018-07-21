@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 19:54:14 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 20:33:38 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,14 @@
 # define DEBUG
 
 # include <malloc.h>
+
+# if !(defined _WIN32 || defined __CYGWIN__) && __GNUC__ >= 4
+#  define MA_PRIVATE __attribute__ ((visibility ("hidden")))
+#  define MA_PUBLIC __attribute__ ((visibility ("default")))
+# else
+#  define MA_PRIVATE
+#  define MA_PUBLIC
+# endif
 
 # pragma pack(push, 1)
 
@@ -172,5 +180,11 @@ void							ma_free(t_ma_found_link *f);
 */
 
 void							*memcpy(void *dest, const void *src, size_t n);
+
+/*
+**
+*/
+
+void							*calloc(size_t nmemb, size_t size);
 
 #endif
