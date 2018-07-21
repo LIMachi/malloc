@@ -6,13 +6,12 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:12:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/20 17:50:57 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 15:07:29 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 #include <sys/mman.h>
-#include <unistd.h>
 
 /*
 ** create a new pool of the chosen type, prepare it and link it
@@ -34,6 +33,9 @@ t_ma_head	*ma_new_pool(size_t size, int type)
 			MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
 		return (NULL);
 	out->next = g_ma_holder.head[type];
+	out->prev = NULL;
+	if (out->next != NULL)
+		out->next->prev = out;
 	out->data->size = size - sizeof(t_ma_link) + sizeof(t_ma_head);
 	out->data->allocated = 0;
 	return ((g_ma_holder.head[type] = out));

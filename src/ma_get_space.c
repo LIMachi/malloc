@@ -6,12 +6,11 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:11:13 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/20 17:50:52 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 14:57:56 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
-#include <unistd.h>
 
 static inline t_ma_link	*sif_cut(size_t nb, int type, t_ma_link *l,
 								size_t total_size)

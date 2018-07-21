@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/20 17:50:11 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/21 19:54:14 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,20 @@ typedef struct					s_ma_link
 typedef struct					s_ma_head
 {
 	struct s_ma_head			*next;
+	struct s_ma_head			*prev;
 	t_ma_link					data[0];
 }								t_ma_head;
 
 # pragma pack(pop)
+
+typedef struct					s_ma_found_link
+{
+	int							type;
+	t_ma_head					*head;
+	t_ma_link					*before;
+	t_ma_link					*found;
+	t_ma_link					*after;
+}								t_ma_found_link;
 
 /*
 ** note: this 2 structures are used for all 3 types of pool, a large is
@@ -143,5 +153,24 @@ t_ma_head						*ma_new_pool(size_t size, int type);
 */
 
 int								ma_debug_itoabuff(int i, char buff[42]);
+
+/*
+**
+*/
+
+int								ma_validate_pointer(void *ptr,
+													t_ma_found_link *f);
+
+/*
+**
+*/
+
+void							ma_free(t_ma_found_link *f);
+
+/*
+**
+*/
+
+void							*memcpy(void *dest, const void *src, size_t n);
 
 #endif

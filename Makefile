@@ -24,7 +24,12 @@ OBJ :=	obj/malloc.o\
 		obj/ma_get_space.o\
 		obj/ma_new_pool.o\
 		obj/categorize.o\
-		obj/ma_debug_itoabuff.o
+		obj/ma_debug_itoabuff.o\
+		obj/ma_validate_pointer.o\
+		obj/reallocf.o\
+		obj/realloc.o\
+		obj/memcpy.o\
+		obj/free.o
 
 FLAGS := -Wall -Wextra -Werror -g -fPIC #-DBONUS=$(BONUS) -rdynamic
 
