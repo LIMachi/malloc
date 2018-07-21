@@ -10,7 +10,7 @@ subject: https://cdn.intra.42.fr/pdf/pdf/1192/ft_malloc.en.pdf
 
 ``void *calloc(size_t nbmem, size_t size)``: see ``man 3 calloc``
 
-``void *reallocf(void *ptr, size_t size)``: same as ``realloc`` but will ``free(ptr)`` if the return is not ``ptr`` itself (NULL or memory was relocated)
+``void *reallocf(void *ptr, size_t size)``: https://linux.die.net/man/3/reallocf
 
 ``void show_alloc_mem(void)``: print information on allocated memory in the form:
 ```
