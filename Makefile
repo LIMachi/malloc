@@ -28,10 +28,10 @@ OBJ :=	obj/malloc.o\
 		obj/ma_validate_pointer.o\
 		obj/reallocf.o\
 		obj/realloc.o\
-		obj/memcpy.o\
 		obj/free.o\
 		obj/show_alloc_mem.o\
-		obj/calloc.o
+		obj/calloc.o\
+		obj/memcpy.o
 
 FLAGS := -Wall -Wextra -Werror -g -fPIC #-DBONUS=$(BONUS) -rdynamic
 
@@ -132,7 +132,8 @@ test_show_alloc_mem: $(NAME)
 test_this_is_madness: $(NAME)
 	clear
 	cat $(TEST_SH)
-	$(TEST_SH) /usr/bin/vi
+	echo "dare use vim now :p"
+	$(TEST_SH) /bin/bash
 
 test_alternative_method_system: $(NAME)
 	clear

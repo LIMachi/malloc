@@ -6,11 +6,13 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 19:50:58 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 20:23:31 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/22 16:46:06 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <malloc_internal.h>
+#include <malloc_internal.h>
+
+#include <unistd.h>
 
 /*
 ** FIXME: memcpy basique et stupide, a remplacer

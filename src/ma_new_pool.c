@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:12:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 20:21:33 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/22 16:43:49 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ MA_PRIVATE t_ma_head	*ma_new_pool(size_t size, int type)
 	else
 	{
 		size = size + sizeof(t_ma_link) + sizeof(t_ma_head);
-		size = (size / g_ma_holder.page_size + (size % g_ma_holder.page_size)) *
+		size = (size / g_ma_holder.page_size + !!(size % g_ma_holder.page_size)) *
 			g_ma_holder.page_size;
 	}
 	if ((out = (t_ma_head*)mmap(0, size, PROT_READ | PROT_WRITE,
@@ -36,7 +36,7 @@ MA_PRIVATE t_ma_head	*ma_new_pool(size_t size, int type)
 	out->prev = NULL;
 	if (out->next != NULL)
 		out->next->prev = out;
-	out->data->size = size - sizeof(t_ma_link) + sizeof(t_ma_head);
+	out->data->size = size - sizeof(t_ma_link) - sizeof(t_ma_head);
 	out->data->allocated = 0;
 	return ((g_ma_holder.head[type] = out));
 }
