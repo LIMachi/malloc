@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/21 20:33:38 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/22 15:36:21 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@
 #  define MA_PUBLIC
 # endif
 
-# pragma pack(push, 1)
-
 typedef struct					s_ma_link
 {
 	size_t						size : __SIZEOF_SIZE_T__ * 8 - 1;
@@ -40,8 +38,6 @@ typedef struct					s_ma_head
 	struct s_ma_head			*prev;
 	t_ma_link					data[0];
 }								t_ma_head;
-
-# pragma pack(pop)
 
 typedef struct					s_ma_found_link
 {
@@ -160,7 +156,8 @@ t_ma_head						*ma_new_pool(size_t size, int type);
 ** DEBUG
 */
 
-int								ma_debug_itoabuff(int i, char buff[42]);
+int								ma_debug_utoabuff(unsigned long long i,
+								char buff[65], int base, const char *base_str);
 
 /*
 **

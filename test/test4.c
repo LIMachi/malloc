@@ -6,12 +6,13 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 18:37:10 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/02 18:46:17 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/22 15:04:22 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
 #include "../inc/malloc.h"
+#include <unistd.h>
+#include <string.h>
 
 void print(char *s)
 {

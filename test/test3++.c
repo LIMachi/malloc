@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 18:35:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/02 18:45:36 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/22 15:35:00 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,12 @@ int main(void)
 
 	addr1 = (char*)malloc(16*M);
 	strcpy(addr1, "Bonjours\n");
+	show_alloc_mem();
 	print(addr1);
 	addr2 = (char*)malloc(16*M);
+	show_alloc_mem();
 	addr3 = (char*)realloc(addr1, 128*M);
+	show_alloc_mem();
 	addr3[127*M] = 42;
 	print(addr3);
 	return (0);

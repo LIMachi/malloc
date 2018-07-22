@@ -78,14 +78,14 @@ test_no_malloc_user: $(NAME)
 	clear
 	cat $(TEST_SH)
 	cat test/test0.c
-	gcc -o test/test0 test/test0.c
+	gcc -o test/test0 test/test0.c -L. -lft_malloc
 	$(TEST_SH) $(TIME) test/test0
 
 test_malloc_user: $(NAME)
 	clear
 	cat $(TEST_SH)
 	cat test/test1.c
-	gcc -o test/test1 test/test1.c
+	gcc -o test/test1 test/test1.c -L. -lft_malloc
 	$(TEST_SH) $(TIME) test/test1
 
 test_free_system:
@@ -99,34 +99,34 @@ test_free_user: $(NAME)
 	clear
 	cat $(TEST_SH)
 	cat test/test2.c
-	gcc -o test/test2 test/test2.c
+	gcc -o test/test2 test/test2.c -L. -lft_malloc
 	$(TEST_SH) $(TIME) test/test2
 
 test_realloc_user: $(NAME)
 	clear
 	cat $(TEST_SH)
 	cat test/test3.c
-	gcc -o test/test3 test/test3.c
+	gcc -o test/test3 test/test3.c -L. -lft_malloc
 	$(TEST_SH) test/test3
 
 test_realloc++: $(NAME)
 	clear
 	cat $(TEST_SH)
 	cat test/test3++.c
-	gcc -o test/test3++ test/test3++.c
+	gcc -o test/test3++ test/test3++.c -L. -lft_malloc
 	$(TEST_SH) test/test3++
 
 test_errors: $(NAME)
 	clear
 	cat $(TEST_SH)
 	cat test/test4.c
-	gcc -o test/test4 test/test4.c
+	gcc -o test/test4 test/test4.c -L. -lft_malloc
 	$(TEST_SH) test/test4
 
 test_show_alloc_mem: $(NAME)
 	clear
 	cat test/test5.c
-	gcc -o test/test5 test/test5.c
+	gcc -o test/test5 test/test5.c -L. -lft_malloc
 	test/test5
 
 test_this_is_madness: $(NAME)
@@ -144,5 +144,5 @@ test_alternative_method_user: $(NAME)
 	clear
 	cat $(TEST_SH)
 	cat test/test6.c
-	gcc -o test/test6 test/test6.c
+	gcc -o test/test6 test/test6.c -L. -lft_malloc
 	$(TEST_SH) test/test6
