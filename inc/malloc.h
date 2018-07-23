@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:42:51 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/18 01:14:39 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/23 06:28:20 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,4 +40,5 @@ void						show_alloc_mem(void);
 void						*calloc(size_t nbmem, size_t size);
 void						*reallocf(void *ptr, size_t size);
 size_t						malloc_usable_size(void *ptr);
+
 #endif

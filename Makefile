@@ -31,7 +31,8 @@ OBJ :=	obj/malloc.o\
 		obj/free.o\
 		obj/show_alloc_mem.o\
 		obj/calloc.o\
-		obj/memcpy.o
+		obj/memcpy.o\
+		obj/ma_next_block.o
 
 FLAGS := -Wall -Wextra -Werror -g -fPIC #-DBONUS=$(BONUS) -rdynamic
 
@@ -127,7 +128,7 @@ test_show_alloc_mem: $(NAME)
 	clear
 	cat test/test5.c
 	gcc -o test/test5 test/test5.c -L. -lft_malloc
-	test/test5
+	$(TEST_SH) test/test5
 
 test_this_is_madness: $(NAME)
 	clear

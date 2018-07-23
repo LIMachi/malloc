@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/22 16:47:21 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/23 06:54:27 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,7 @@ void							*memcpy(void *dest, const void *src, size_t n);
 **
 */
 
-void							*calloc(size_t nmemb, size_t size);
+t_ma_link						*ma_next_block(t_ma_head *h, int type,
+												t_ma_link *l, int *error);
 
 #endif
