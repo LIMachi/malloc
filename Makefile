@@ -32,7 +32,9 @@ OBJ :=	obj/malloc.o\
 		obj/show_alloc_mem.o\
 		obj/calloc.o\
 		obj/memcpy.o\
-		obj/ma_next_block.o
+		obj/ma_next_block.o\
+		obj/malloc_trim.o\
+		obj/malloc_usable_size.o
 
 FLAGS := -Wall -Wextra -Werror -g -fPIC #-DBONUS=$(BONUS) -rdynamic
 
