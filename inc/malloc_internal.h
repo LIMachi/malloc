@@ -6,16 +6,18 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 06:54:27 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/24 17:40:38 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MALLOC_INTERNAL_H
 # define MALLOC_INTERNAL_H
 
-# define DEBUG
-
 # include <malloc.h>
+
+# include <pthread.h>
+
+# include <unistd.h>
 
 # if !(defined _WIN32 || defined __CYGWIN__) && __GNUC__ >= 4
 #  define MA_PRIVATE __attribute__ ((visibility ("hidden")))
@@ -86,8 +88,6 @@ typedef enum					e_ma_flags
 
 # define MA_DEFAULT_POOL_SIZE	128
 
-# ifdef BONUS
-
 typedef struct					s_ma_bonus
 {
 	t_ma_flags					flags;
@@ -100,15 +100,11 @@ typedef struct					s_ma_bonus
 
 pthread_mutex_t					g_ma_mutex;
 
-# endif
-
-# ifdef DEBUG
 typedef struct					s_ma_debug
 {
 	size_t						pool_count;
 	size_t						alloc_count;
 }								t_ma_debug;
-# endif
 
 typedef struct					s_ma_holder
 {
@@ -117,12 +113,8 @@ typedef struct					s_ma_holder
 	size_t						pool_size;
 	t_ma_type_data				td[3];
 	t_ma_head					*head[3];
-# ifdef BONUS
 	t_ma_bonus					bonus;
-# endif
-# ifdef DEBUG
 	t_ma_debug					debug;
-# endif
 }								t_ma_holder;
 
 t_ma_holder						g_ma_holder;
@@ -184,5 +176,11 @@ void							*memcpy(void *dest, const void *src, size_t n);
 
 t_ma_link						*ma_next_block(t_ma_head *h, int type,
 												t_ma_link *l, int *error);
+
+/*
+**
+*/
+
+t_ma_link						*ma_malloc(size_t size, int type);
 
 #endif

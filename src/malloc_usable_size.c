@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/23 07:12:45 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 07:36:07 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/23 08:52:56 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ size_t	malloc_usable_size(void *ptr)
 
 	if (ptr == NULL)
 		return (0);
-	if (ma_validate_pointer(ptr, &f) && f.found->allocated)
-		return (f.found->size);
+	if (ma_validate_pointer(ptr - g_ma_holder.bonus.guard_edges, &f)
+			&& f.found->allocated)
+		return (f.found->size - g_ma_holder.bonus.guard_edges * 2);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 20:24:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 06:42:06 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/23 08:50:58 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ static inline void	print_array(void *data, size_t size)
 	static const char	base[16] = "0123456789ABCDEF";
 	size_t				len;
 
+	data += g_ma_holder.bonus.guard_edges;
+	size -= g_ma_holder.bonus.guard_edges * 2;
 	len = ma_debug_utoabuff((size_t)data, buff, 16, base);
 	write(1, "0x0000000000", 12 - len);
 	write(1, buff, len);

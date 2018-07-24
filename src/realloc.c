@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:05:30 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 06:54:11 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/24 17:50:04 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,13 @@ static inline void	*sif_realloc1(t_ma_found_link *f, size_t size)
 	if (f->after == NULL || !f->after->allocated
 		|| f->after->size + f->found->size + sizeof(t_ma_link) < size)
 	{
-		if ((tmp = malloc(size)) == NULL)
+		if ((tmp = malloc(size - g_ma_holder.bonus.guard_edges * 2)) == NULL)
 			return (NULL);
-		memcpy(tmp, f->found->data,
-				f->found->size < size ? f->found->size : size);
+		memcpy(tmp, f->found->data + g_ma_holder.bonus.guard_edges,
+				(f->found->size < size ? f->found->size : size)
+				- g_ma_holder.bonus.guard_edges * 2);
 		ma_free(f);
-		return (tmp);
+		return (tmp + g_ma_holder.bonus.guard_edges);
 	}
 	else if (f->found->size + f->after->size + sizeof(t_ma_link)
 			- size < sizeof(t_ma_link))
@@ -91,30 +92,29 @@ static inline void	*sif_realloc0(t_ma_found_link *f, size_t size)
 	return (sif_realloc1(f, size));
 }
 
-MA_PUBLIC void		*realloc(void *ptr, size_t size)
+MA_PUBLIC void		*realloc(void *p, size_t size)
 {
 	t_ma_found_link	f;
-	int				type;
 	void			*out;
 
-	if (ptr == NULL)
+	if (p == NULL)
 		return (malloc(size));
 	if (size == 0)
-	{
-		free(ptr);
+		free(p);
+	if (size == 0 || !ma_validate_pointer(p - g_ma_holder.bonus.guard_edges, &f)
+				|| !f.found->allocated)
 		return (NULL);
-	}
-	if (!ma_validate_pointer(ptr, &f) || !f.found->allocated)
-		return (NULL); //invalid pointer
-	type = ma_categorize(size);
-	if (type != f.type || (type == MA_T_LARGE && f.found->size < size))
+	if (ma_categorize((size += g_ma_holder.bonus.guard_edges * 2)) != f.type
+		|| (ma_categorize(size) == MA_T_LARGE && f.found->size < size))
 	{
-		if ((out = malloc(size)) != NULL)
+		if ((out = malloc(size - g_ma_holder.bonus.guard_edges * 2)) != NULL)
 		{
-			memcpy(out, ptr, f.found->size < size ? f.found->size : size);
+			memcpy(out, f.found->data + g_ma_holder.bonus.guard_edges,
+				(f.found->size < size ? f.found->size : size)
+				- g_ma_holder.bonus.guard_edges * 2);
 			ma_free(&f);
 		}
 		return (out);
 	}
-	return (sif_realloc0(&f, size));
+	return (sif_realloc0(&f, size) + g_ma_holder.bonus.guard_edges);
 }
