@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:05:30 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/24 17:50:04 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/25 20:51:02 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ static inline void	*sif_realloc1(t_ma_found_link *f, size_t size)
 	if (f->after == NULL || !f->after->allocated
 		|| f->after->size + f->found->size + sizeof(t_ma_link) < size)
 	{
+		ma_log("realloc", 1, "call forwarded to malloc (pool swap)");
+		--g_ma_holder.bonus.call_number;
 		if ((tmp = malloc(size - g_ma_holder.bonus.guard_edges * 2)) == NULL)
 			return (NULL);
 		memcpy(tmp, f->found->data + g_ma_holder.bonus.guard_edges,
@@ -77,6 +79,7 @@ static inline void	*sif_realloc1(t_ma_found_link *f, size_t size)
 static inline void	*sif_realloc0(t_ma_found_link *f, size_t size)
 {
 	t_ma_link	*tmp;
+	void		*out;
 
 	if (size <= f->found->size)
 	{
@@ -89,7 +92,44 @@ static inline void	*sif_realloc0(t_ma_found_link *f, size_t size)
 		}
 		return (f->found->data);
 	}
-	return (sif_realloc1(f, size));
+	out = sif_realloc1(f, size) + g_ma_holder.bonus.guard_edges;
+
+	return (out);
+}
+
+static inline int	sif_realloc2(void *p, size_t size, void **out)
+{
+	// char	buff0[65];
+	// char	buff1[65];
+
+	*out = NULL;
+	if (!g_ma_holder.initialized)
+		ma_init();
+	++g_ma_holder.bonus.call_number;
+	if (p == NULL)
+	{
+		*out = malloc(size);
+		return (1);
+	}
+	if (size == 0)
+	{
+		free(p);
+		return (1);
+	}
+	return (0);
+/*
+	if (g_ma_holder.bonus.flags & (ALLOC_LOG | FREE_LOG))
+	{
+		ma_debug_utoabuff((size_t)p, buff0, 16, "0123456789ABCDEF");
+		ma_debug_utoabuff(size, buff1, 10, "0123456789");
+		ma_log(4, "call to realloc on 0x", buff0, " with a new size of ", buff1,
+			" bytes");
+		if (p == NULL)
+			ma_log(1, "realloc call forwarded to malloc (NULL pointer)");
+		else if (size == 0)
+			ma_log(1, "realloc call forwarded to free (null size)");
+	}
+*/
 }
 
 MA_PUBLIC void		*realloc(void *p, size_t size)
@@ -97,16 +137,16 @@ MA_PUBLIC void		*realloc(void *p, size_t size)
 	t_ma_found_link	f;
 	void			*out;
 
-	if (p == NULL)
-		return (malloc(size));
-	if (size == 0)
-		free(p);
+	if (sif_realloc2(p, size, &out))
+		return (out);
 	if (size == 0 || !ma_validate_pointer(p - g_ma_holder.bonus.guard_edges, &f)
 				|| !f.found->allocated)
 		return (NULL);
 	if (ma_categorize((size += g_ma_holder.bonus.guard_edges * 2)) != f.type
 		|| (ma_categorize(size) == MA_T_LARGE && f.found->size < size))
 	{
+		ma_log("realloc", 1, "call forwarded to malloc (pool swap)");
+		--g_ma_holder.bonus.call_number;
 		if ((out = malloc(size - g_ma_holder.bonus.guard_edges * 2)) != NULL)
 		{
 			memcpy(out, f.found->data + g_ma_holder.bonus.guard_edges,
@@ -114,7 +154,8 @@ MA_PUBLIC void		*realloc(void *p, size_t size)
 				- g_ma_holder.bonus.guard_edges * 2);
 			ma_free(&f);
 		}
-		return (out);
 	}
-	return (sif_realloc0(&f, size) + g_ma_holder.bonus.guard_edges);
+	else
+		out = sif_realloc0(&f, size);
+	return (out);
 }

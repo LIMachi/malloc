@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:30:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 08:39:41 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/25 20:43:54 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ t_ma_holder			g_ma_holder = {
 		.scribble = '\0',
 		.pages_mapped = 0,
 		.pages_writen = 0,
-		.log_fd = 2
+		.log_fd = 2,
+		.call_number = 0
 	}
 };
 
@@ -131,31 +132,3 @@ MA_PRIVATE void		ma_init(void)
 	sif_bonus(&g_ma_holder.bonus);
 	g_ma_holder.initialized = 1;
 }
-
-/*
-** MA_PRIVATE void 	ma_init(void)
-** {
-** 	size_t	page_size_power;
-** 	size_t	tmp;
-**
-** 	g_ma_holder.page_size = (size_t)getpagesize();
-** 	tmp = g_ma_holder.page_size;
-** 	page_size_power = 0;
-** 	while (tmp >>= 1)
-** 		++page_size_power;
-** 	g_ma_holder.td[0].maximum_size = 1 << (page_size_power / 2);
-** 	g_ma_holder.td[1].minimum_size = g_ma_holder.td[0].maximum_size;
-** 	g_ma_holder.td[1].maximum_size = 1 << (page_size_power * 4);
-** 	g_ma_holder.td[2].minimum_size = g_ma_holder.td[1].maximum_size;
-** 	g_ma_holder.td[2].maximum_size = (size_t)-1;
-** 	tmp = sizeof(t_ma_head) + g_ma_holder.pool_size *
-** 		(g_ma_holder.td[0].maximum_size + sizeof(t_ma_link));
-** 	g_ma_holder.td[0].pool_size = (tmp / g_ma_holder.page_size +
-** 		!!(tmp % g_ma_holder.page_size)) * g_ma_holder.page_size;
-** 	tmp = sizeof(t_ma_head) + g_ma_holder.pool_size *
-** 		(g_ma_holder.td[1].maximum_size + sizeof(t_ma_link));
-** 	g_ma_holder.td[1].pool_size = (tmp / g_ma_holder.page_size +
-** 		!!(tmp % g_ma_holder.page_size)) * g_ma_holder.page_size;
-** 	g_ma_holder.initialized = 1;
-** }
-*/

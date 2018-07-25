@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/24 17:40:38 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/25 20:45:51 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ typedef struct					s_ma_bonus
 	size_t						pages_mapped;
 	size_t						pages_writen;
 	int							log_fd;
+	size_t						call_number;
 }								t_ma_bonus;
 
 pthread_mutex_t					g_ma_mutex;
@@ -182,5 +183,14 @@ t_ma_link						*ma_next_block(t_ma_head *h, int type,
 */
 
 t_ma_link						*ma_malloc(size_t size, int type);
+
+/*
+**
+*/
+
+size_t							ma_log(const char *function_name,
+										size_t nb_arg, ...);
+size_t							ma_error(const char *function_name,
+										size_t nb_arg, ...);
 
 #endif

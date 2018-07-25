@@ -35,4 +35,4 @@ Total : 52698 octets
 |MALLOC_FRAGMENTED   |none              |MALLOC_FRAGMANTED              |no         |do not apply a defragmentation on freed memory, might increase the page mapping, used for debbuging purpose only|
 |MALLOC_NO_FREE      |none              |MALLOC_NO_FREE                 |no         |do not set as free freed memory, increase drastically the page mapping, used for debbuging purpose only, free is still simulated, so if combined with log/invalid pointer it will output informations|
 |MALLOC_EXIT_ON_ERROR|none              |MALLOC_EXIT_ON_ERROR           |no         |explicit, will exit on any error and will force a log of the error|
-|MALLOC_LOG_FILE     |path to file      |MALLOC_LOG_FILE="./malloc.log" |no         |will output all log information in the file located at $MALLOC_LOG_FILE location (in append mode) instead of stderr|
+|MALLOC_LOG_FILE     |path to file      |MALLOC_LOG_FILE="./malloc.log" |no         |will output all log information in the file located at $MALLOC_LOG_FILE location (in append mode) instead of stderr, by default, if ALLOC_LOG and FREE_LOG arrent set, will only store errors and warnings|

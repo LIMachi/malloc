@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 18:27:31 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/04/23 02:18:15 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/25 20:36:23 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ int main(void)
 	i = 0;
 	while (i < 1024)
 	{
-		// addr = (char*)malloc(1024);
-		// addr[0] = 42;
+		addr = (char*)malloc(1024);
+		addr[0] = 42;
 		i++;
 	}
 	return (0);

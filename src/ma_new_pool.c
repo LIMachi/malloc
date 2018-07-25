@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:12:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/22 16:43:49 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/25 20:47:17 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ MA_PRIVATE t_ma_head	*ma_new_pool(size_t size, int type)
 	}
 	if ((out = (t_ma_head*)mmap(0, size, PROT_READ | PROT_WRITE,
 			MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
-		return (NULL);
+		return ((t_ma_head*)ma_error("ma_new_pool", 1,
+									"out of memory (mmap failure)"));
 	out->next = g_ma_holder.head[type];
 	out->prev = NULL;
 	if (out->next != NULL)

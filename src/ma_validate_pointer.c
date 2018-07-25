@@ -6,20 +6,27 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 14:57:43 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 07:04:09 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/25 20:47:25 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
+
+static inline void	error(void *ptr)
+{
+	char	buff[65];
+
+	ma_debug_utoabuff((size_t)ptr, buff, 16, "0123456789ABCDEF");
+	ma_error("ma_validate_pointer", 3, "invalid pointer 0x", buff,
+		" cannot be resolved in any pool");
+}
 
 MA_PRIVATE int		ma_validate_pointer(void *ptr, t_ma_found_link *f)
 {
 	int	err;
 
 	f->type = -1;
-	while (++f->type < 3)
-	{
-		f->head = g_ma_holder.head[f->type];
+	while (++f->type < 3 && ((f->head = g_ma_holder.head[f->type]) || 1))
 		while (f->head != NULL && !(f->before = NULL))
 		{
 			f->found = f->head->data;
@@ -37,6 +44,7 @@ MA_PRIVATE int		ma_validate_pointer(void *ptr, t_ma_found_link *f)
 			}
 			f->head = f->head->next;
 		}
-	}
+	if (f->type >= 3)
+		error(ptr);
 	return (f->type < 3);
 }
