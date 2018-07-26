@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:05:30 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 13:53:47 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 14:49:28 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,33 @@ static inline void	*sif_realloc1(t_ma_found_link *f, size_t size)
 	return (f->found->data);
 }
 
+static inline int	sif_log(void *p, size_t size, void *out, int call)
+{
+	char	buff0[65];
+	char	buff1[65];
+	char	buff2[65];
+
+	if (!call)
+		return (pthread_mutex_unlock(&g_ma_mutex));
+	ma_debug_utoabuff((size_t)p, buff0, 16, "0123456789ABCDEF");
+	ma_debug_utoabuff(size, buff1, 10, "0123456789");
+	if (call == 1)
+	{
+		ma_log("realloc", 4, "call to realloc on 0x", buff0,
+			" with a new size of ", buff1, " bytes");
+		if (p == NULL)
+			ma_log("realloc", 1,
+				"realloc call forwarded to malloc (NULL pointer)");
+		else if (size == 0)
+			ma_log("realloc", 1, "realloc call forwarded to free (null size)");
+		return (0);
+	}
+	ma_debug_utoabuff((size_t)out, buff2, 16, "0123456789ABCDEF");
+	ma_log("realloc", 6, "new position of 0x", buff0, " with a size of ",
+		buff1, " bytes: 0x", buff2);
+	return (pthread_mutex_unlock(&g_ma_mutex));
+}
+
 static inline void	*sif_realloc0(t_ma_found_link *f, size_t size)
 {
 	t_ma_link	*tmp;
@@ -93,20 +120,20 @@ static inline void	*sif_realloc0(t_ma_found_link *f, size_t size)
 		return (f->found->data);
 	}
 	out = sif_realloc1(f, size) + g_ma_holder.bonus.guard_edges;
-
+	if (g_ma_holder.bonus.flags & (ALLOC_LOG | FREE_LOG))
+		sif_log(f->found->data + g_ma_holder.bonus.guard_edges, size, out, 0);
 	return (out);
 }
 
 static inline int	sif_realloc2(void *p, size_t size, void **out)
 {
-	// char	buff0[65];
-	// char	buff1[65];
-
 	*out = NULL;
 	pthread_mutex_lock(&g_ma_mutex);
 	if (!g_ma_holder.initialized)
 		ma_init();
 	++g_ma_holder.bonus.call_number;
+	if (g_ma_holder.bonus.flags & (ALLOC_LOG | FREE_LOG))
+		sif_log(p, size, NULL, 1);
 	if (p == NULL)
 	{
 		*out = malloc(size);
@@ -118,46 +145,33 @@ static inline int	sif_realloc2(void *p, size_t size, void **out)
 		return (1);
 	}
 	return (0);
-/*
-	if (g_ma_holder.bonus.flags & (ALLOC_LOG | FREE_LOG))
-	{
-		ma_debug_utoabuff((size_t)p, buff0, 16, "0123456789ABCDEF");
-		ma_debug_utoabuff(size, buff1, 10, "0123456789");
-		ma_log(4, "call to realloc on 0x", buff0, " with a new size of ", buff1,
-			" bytes");
-		if (p == NULL)
-			ma_log(1, "realloc call forwarded to malloc (NULL pointer)");
-		else if (size == 0)
-			ma_log(1, "realloc call forwarded to free (null size)");
-	}
-*/
 }
 
-MA_PUBLIC void		*realloc(void *p, size_t size)
+MA_PUBLIC void		*realloc(void *p, size_t s)
 {
 	t_ma_found_link	f;
-	void			*out;
+	void			*o;
 
-	if (sif_realloc2(p, size, &out))
-		return (out);
-	if (size == 0 || !ma_validate_pointer(p - g_ma_holder.bonus.guard_edges, &f)
+	if (sif_realloc2(p, s, &o))
+		return (o);
+	if (s == 0 || !ma_validate_pointer(p - g_ma_holder.bonus.guard_edges, &f)
 				|| !f.found->allocated)
 		return (NULL);
-	if (ma_categorize((size += g_ma_holder.bonus.guard_edges * 2)) != f.type
-		|| (ma_categorize(size) == MA_T_LARGE && f.found->size < size))
+	if (ma_categorize((s += g_ma_holder.bonus.guard_edges * 2)) != f.type
+		|| (ma_categorize(s) == MA_T_LARGE && f.found->size < s))
 	{
 		ma_log("realloc", 1, "call forwarded to malloc (pool swap)");
 		--g_ma_holder.bonus.call_number;
-		if ((out = malloc(size - g_ma_holder.bonus.guard_edges * 2)) != NULL)
+		if ((o = malloc(s - g_ma_holder.bonus.guard_edges * 2)) != NULL)
 		{
-			memcpy(out, f.found->data + g_ma_holder.bonus.guard_edges,
-				(f.found->size < size ? f.found->size : size)
+			memcpy(o, f.found->data + g_ma_holder.bonus.guard_edges,
+				(f.found->size < s ? f.found->size : s)
 				- g_ma_holder.bonus.guard_edges * 2);
 			ma_free(&f);
 		}
 	}
 	else
-		out = sif_realloc0(&f, size);
-	pthread_mutex_unlock(&g_ma_mutex);
-	return (out);
+		o = sif_realloc0(&f, s);
+	sif_log(p, s, o, g_ma_holder.bonus.flags & (ALLOC_LOG | FREE_LOG) ? 2 : 0);
+	return (o);
 }
