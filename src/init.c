@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:30:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 13:49:00 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 15:47:51 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ t_ma_holder			g_ma_holder = {
 		.pages_mapped = 0,
 		.pages_writen = 0,
 		.log_fd = 2,
-		.call_number = 0
+		.call_number = 0,
+		.hexdump_len = 256
 	}
 };
 
@@ -78,7 +79,19 @@ t_ma_holder			g_ma_holder = {
 ** int open(const char *pathname, int flags);
 */
 
-static inline void	sif_bonus(t_ma_bonus *b)
+static inline void	sif_bonus1(t_ma_bonus *b)
+{
+	if (NULL != getenv("MALLOC_EXIT_ON_ERROR"))
+		b->flags |= EXIT_ON_ERROR;
+	if (NULL != getenv("MALLOC_NO_FREE"))
+		b->flags |= NO_FREE;
+	if (NULL != getenv("MALLOC_FRAGMENTED"))
+		b->flags |= FRAGMENTED;
+	if (NULL != getenv("MALLOC_SHOW_UNALLOCATED"))
+		b->flags |= SHOW_UNALLOCATED;
+}
+
+static inline void	sif_bonus0(t_ma_bonus *b)
 {
 	char	*v;
 
@@ -90,6 +103,8 @@ static inline void	sif_bonus(t_ma_bonus *b)
 		b->scribble = (char)strtoll(v, NULL, 0);
 	if (NULL != (v = getenv("MALLOC_GUARD_EDGES")) && (b->flags |= GUARD_EDGES))
 		b->guard_edges = (size_t)strtoll(v, NULL, 0);
+	if (NULL != (v = getenv("MALLOC_HEXDUMP_LENGTH")))
+		b->hexdump_len = (size_t)strtoll(v, NULL, 0);
 	if (NULL != getenv("MALLOC_ALLOC_LOG"))
 		b->flags |= ALLOC_LOG;
 	if (NULL != getenv("MALLOC_FREE_LOG"))
@@ -98,12 +113,7 @@ static inline void	sif_bonus(t_ma_bonus *b)
 		b->flags |= LAZY_ALIGN;
 	if (NULL != getenv("MALLOC_HEXDUMP"))
 		b->flags |= HEXDUMP;
-	if (NULL != getenv("MALLOC_EXIT_ON_ERROR"))
-		b->flags |= EXIT_ON_ERROR;
-	if (NULL != getenv("MALLOC_NO_FREE"))
-		b->flags |= NO_FREE;
-	if (NULL != getenv("MALLOC_FRAGMENTED"))
-		b->flags |= FRAGMENTED;
+	sif_bonus1(b);
 }
 
 MA_PRIVATE void		ma_init(void)
@@ -129,6 +139,6 @@ MA_PRIVATE void		ma_init(void)
 		(g_ma_holder.td[1].maximum_size + sizeof(t_ma_link));
 	g_ma_holder.td[1].pool_size = (tmp / g_ma_holder.page_size +
 		!!(tmp % g_ma_holder.page_size)) * g_ma_holder.page_size;
-	sif_bonus(&g_ma_holder.bonus);
+	sif_bonus0(&g_ma_holder.bonus);
 	g_ma_holder.initialized = 1;
 }

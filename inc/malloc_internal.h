@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:45:51 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 16:29:17 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,11 +57,9 @@ typedef struct					s_ma_found_link
 
 typedef struct					s_ma_type_data
 {
-	size_t						minimum_size;	//in bytes
-	size_t						maximum_size;	//in bytes
-												// -1 for large (pseudo infinite/unused)
-	size_t						pool_size;		//ceil((sizeof(t_ma_header_link) + POOL_SIZE * (maximum_size + sizeof(t_ma_header_link))) / pagesize) * pagesize
-												//0 for large (adaptative/unused)
+	size_t						minimum_size;
+	size_t						maximum_size;
+	size_t						pool_size;
 }								t_ma_type_data;
 
 typedef enum					e_ma_flags
@@ -79,7 +77,8 @@ typedef enum					e_ma_flags
 	LAZY_ALIGN =				1 << 9,
 	NO_UNMAP =					1 << 10,
 	EXIT_ON_ERROR =				1 << 11,
-	FILE_LOG =					1 << 12
+	FILE_LOG =					1 << 12,
+	SHOW_UNALLOCATED =			1 << 13
 }								t_ma_flags;
 
 # define MA_T_TINY				0
@@ -97,6 +96,7 @@ typedef struct					s_ma_bonus
 	size_t						pages_writen;
 	int							log_fd;
 	size_t						call_number;
+	size_t						hexdump_len;
 }								t_ma_bonus;
 
 pthread_mutex_t					g_ma_mutex;
@@ -192,5 +192,6 @@ size_t							ma_log(const char *function_name,
 										size_t nb_arg, ...);
 size_t							ma_error(const char *function_name,
 										size_t nb_arg, ...);
+void							hexdump(void *data, size_t size);
 
 #endif

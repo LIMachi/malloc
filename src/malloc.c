@@ -6,12 +6,13 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:03 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 14:02:00 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 17:51:28 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 #include <unistd.h>
+#include <string.h>
 
 MA_PRIVATE t_ma_link	*ma_malloc(size_t size, int type)
 {
@@ -23,6 +24,8 @@ MA_PRIVATE t_ma_link	*ma_malloc(size_t size, int type)
 			return (NULL);
 		l = ma_get_space(size, type);
 	}
+	if (l != NULL && g_ma_holder.bonus.flags & SCRIBBLE)
+		memset(l->data, g_ma_holder.bonus.scribble, l->size);
 	return (l);
 }
 

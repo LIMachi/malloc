@@ -26,12 +26,14 @@ Total : 52698 octets
 
 ## Environement variables:
 |name              |values              |example                        |implemented|description                                        |
-|--------------------|------------------|-------------------------------|-----------|---------------------------------------------------|
-|MALLOC_SCRIBBLE     |char (hexa or int)|MALLOC_SCRIBBLE=0x42           |yes        |use scribble as default value to apply to free data, usefull to see accessed then freed data|
-|MALLOC_GUARD_EDGES  |int (hexa or int) |MALLOC_GUARD_EDGES=0x10        |yes        |add bytes before and after allocated data as a protection against overflow|
-|MALLOC_ALLOC_LOG    |none              |MALLOC_ALLOC_LOG               |yes        |print additional information in stdout on alloc or reallocation of memory|
-|MALLOC_FREE_LOG     |none              |MALLOC_FREE_LOG                |yes        |print additional information in stdout on free or reallocation of memory|
-|MALLOC_HEXDUMP      |none              |MALLOC_HEXDUMP                 |no         |change the default behavior of show_alloc_mem()|
-|MALLOC_NO_FREE      |none              |MALLOC_NO_FREE                 |yes        |do not set as free freed memory, increase drastically the page mapping, used for debbuging purpose only, free is still simulated, so if combined with log/invalid pointer it will output informations, but will not use the scribble option|
-|MALLOC_EXIT_ON_ERROR|none              |MALLOC_EXIT_ON_ERROR           |yes        |explicit, will exit on any error and will force a log of the error|
-|MALLOC_LOG_FILE     |path to file      |MALLOC_LOG_FILE="./malloc.log" |yes        |will output all log information in the file located at $MALLOC_LOG_FILE location (in append mode) instead of stderr, by default, if ALLOC_LOG and FREE_LOG arrent set, will only store errors and warnings|
+|-----------------------|------------------|-------------------------------|-----------|---------------------------------------------------|
+|MALLOC_SCRIBBLE        |char (hexa or int)|MALLOC_SCRIBBLE=0x42           |yes        |use scribble as default value to apply to free data, usefull to see accessed then freed data|
+|MALLOC_GUARD_EDGES     |int (hexa or int) |MALLOC_GUARD_EDGES=0x10        |yes        |add bytes before and after allocated data as a protection against overflow|
+|MALLOC_ALLOC_LOG       |none              |MALLOC_ALLOC_LOG=              |yes        |print additional information in stdout on alloc or reallocation of memory|
+|MALLOC_FREE_LOG        |none              |MALLOC_FREE_LOG=               |yes        |print additional information in stdout on free or reallocation of memory|
+|MALLOC_SHOW_UNALLOCATED|none              |MALLOC_SHOW_UNALLOCATED=       |yes        |force show_alloc_mem and the hexdump variant to also print unallocated block|
+|MALLOC_HEXDUMP         |none              |MALLOC_HEXDUMP=                |yes        |change the default behavior of show_alloc_mem() to have a look similar to hexdump -C|
+|MALLOC_HEXDUMP_LENGTH  |int (hexa or int) |MALLOC_HEXDUMP_LENGTH=256      |yes        |determine how much of the memory will be printed using show_alloc_mem() with the HEXDUMP option|
+|MALLOC_NO_FREE         |none              |MALLOC_NO_FREE=                |yes        |do not set as free freed memory, increase drastically the page mapping, used for debbuging purpose only, free is still simulated, so if combined with log/invalid pointer it will output informations, but will not use the scribble option|
+|MALLOC_EXIT_ON_ERROR   |none              |MALLOC_EXIT_ON_ERROR=          |yes        |explicit, will exit on any error and will force a log of the error|
+|MALLOC_LOG_FILE        |path to file      |MALLOC_LOG_FILE="./malloc.log" |yes        |will output all log information in the file located at $MALLOC_LOG_FILE location (in append mode) instead of stderr, by default, if ALLOC_LOG and FREE_LOG arrent set, will only store errors and warnings|

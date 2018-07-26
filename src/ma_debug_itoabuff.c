@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/20 17:06:28 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/22 15:35:24 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 17:21:36 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 MA_PRIVATE int	ma_debug_utoabuff(unsigned long long i, char buff[65], int base,
 								const char *base_str)
 {
-	int l;
-	int t;
+	int					l;
+	unsigned long long	t;
 
 	l = 1;
 	t = i;
