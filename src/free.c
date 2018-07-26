@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 19:49:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:47:09 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 14:00:08 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ MA_PUBLIC void	free(void *ptr)
 	t_ma_found_link	f;
 	char			buff[65];
 
+	pthread_mutex_lock(&g_ma_mutex);
 	if (!g_ma_holder.initialized)
 		ma_init();
 	++g_ma_holder.bonus.call_number;
@@ -43,15 +44,17 @@ MA_PUBLIC void	free(void *ptr)
 		ma_debug_utoabuff((size_t)ptr, buff, 16, "0123456789ABCDEF");
 		ma_log("free", 2, "free pointer 0x", buff);
 	}
-	if (ptr == NULL)
+	if (!ptr || !ma_validate_pointer(ptr - g_ma_holder.bonus.guard_edges, &f))
+	{
+		pthread_mutex_unlock(&g_ma_mutex);
 		return ;
-	if (!ma_validate_pointer(ptr - g_ma_holder.bonus.guard_edges, &f))
-		return ;
+	}
 	if (!f.found->allocated)
 	{
 		ma_debug_utoabuff((size_t)ptr, buff, 16, "0123456789ABCDEF");
 		ma_error("free", 2, "trying to free unalocated pointer 0x", buff);
-		return ;
 	}
-	ma_free(&f);
+	else
+		ma_free(&f);
+	pthread_mutex_unlock(&g_ma_mutex);
 }

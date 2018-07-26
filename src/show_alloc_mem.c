@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 20:24:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 08:50:58 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 14:01:08 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ MA_PUBLIC void	show_alloc_mem(void)
 	char				buff[65];
 
 	type = -1;
+	pthread_mutex_lock(&g_ma_mutex);
 	while (++type < 3 && ((h = g_ma_holder.head[type]) || 1))
 		while (h != NULL)
 		{
@@ -59,4 +60,5 @@ MA_PUBLIC void	show_alloc_mem(void)
 			}
 			h = h->next;
 		}
+	pthread_mutex_unlock(&g_ma_mutex);
 }

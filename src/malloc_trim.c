@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/23 07:12:24 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/23 07:42:35 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 14:19:24 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ size_t					malloc_trim(void)
 	count = 0;
 	while (++type)
 	{
+		pthread_mutex_lock(&g_ma_mutex);
 		if (type == MA_T_LARGE)
 			h = g_ma_holder.head[MA_T_LARGE];
 		else
@@ -59,6 +60,7 @@ size_t					malloc_trim(void)
 				g_ma_holder.head[type]->next : NULL;
 		while (h != NULL)
 			count += sif_malloc_trim(&h, type);
+		pthread_mutex_unlock(&g_ma_mutex);
 	}
 	return (count);
 }

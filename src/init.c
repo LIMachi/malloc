@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:30:41 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:43:54 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 13:49:00 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 ** int getpagesize(void)
 */
 
-pthread_mutex_t		g_ma_mutex;
+pthread_mutex_t		g_ma_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 t_ma_holder			g_ma_holder = {
 	.initialized = 0,

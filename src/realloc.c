@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:05:30 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:51:02 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 13:53:47 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ static inline int	sif_realloc2(void *p, size_t size, void **out)
 	// char	buff1[65];
 
 	*out = NULL;
+	pthread_mutex_lock(&g_ma_mutex);
 	if (!g_ma_holder.initialized)
 		ma_init();
 	++g_ma_holder.bonus.call_number;
@@ -157,5 +158,6 @@ MA_PUBLIC void		*realloc(void *p, size_t size)
 	}
 	else
 		out = sif_realloc0(&f, size);
+	pthread_mutex_unlock(&g_ma_mutex);
 	return (out);
 }

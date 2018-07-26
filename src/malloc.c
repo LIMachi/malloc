@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:03 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:47:54 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 14:02:00 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,19 @@ MA_PUBLIC void			*malloc(size_t size)
 	char		buff0[65];
 	char		buff1[65];
 
+	pthread_mutex_lock(&g_ma_mutex);
 	if (!g_ma_holder.initialized)
 		ma_init();
 	++g_ma_holder.bonus.call_number;
+	ma_debug_utoabuff(size, buff0, 10, "0123456789");
+	ma_log("malloc", 3, "call to malloc with a size of ", buff0, " bytes");
 	size += g_ma_holder.bonus.guard_edges * 2;
 	type = ma_categorize(size);
 	if ((l = ma_malloc(size, type)) == NULL)
-		return (NULL);
+		return ((void*)(pthread_mutex_unlock(&g_ma_mutex) * 0l));
+	pthread_mutex_unlock(&g_ma_mutex);
 	if (g_ma_holder.bonus.flags & ALLOC_LOG)
 	{
-		ma_debug_utoabuff(size - g_ma_holder.bonus.guard_edges * 2, buff0, 10, "0123456789");
 		ma_debug_utoabuff((size_t)l->data + g_ma_holder.bonus.guard_edges,
 			buff1, 16, "0123456789ABCDEF");
 		ma_log("malloc", 4, "alloc of size: ", buff0,
