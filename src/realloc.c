@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:05:30 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 18:52:02 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 19:51:01 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,11 +135,13 @@ static inline int	sif_realloc2(void *p, size_t size, void **out)
 		sif_log(p, size, NULL, 1);
 	if (p == NULL)
 	{
+		pthread_mutex_unlock(&g_ma_mutex);
 		*out = malloc(size);
 		return (1);
 	}
 	if (size == 0)
 	{
+		pthread_mutex_unlock(&g_ma_mutex);
 		free(p);
 		return (1);
 	}

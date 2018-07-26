@@ -6,11 +6,11 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 18:27:31 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/20 16:26:44 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 19:32:15 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <malloc.h>
+#include "../inc/malloc.h"
 
 #include <unistd.h>
 
