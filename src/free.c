@@ -6,20 +6,20 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 19:49:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 14:26:27 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:52:29 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 #include <string.h>
 
-MA_PRIVATE void	ma_free(t_ma_found_link *f)
+int		ma_free(t_ma_found_link *f)
 {
 	if (g_ma_holder.bonus.flags & NO_FREE)
 	{
 		if (g_ma_holder.bonus.flags & FREE_LOG)
 			ma_log("ma_free", 1, "call to free ignored (MALLOC_NO_FREE)");
-		return ;
+		return (0);
 	}
 	f->found->allocated = 0;
 	if (f->before != NULL && !f->before->allocated)
@@ -34,9 +34,10 @@ MA_PRIVATE void	ma_free(t_ma_found_link *f)
 	}
 	if (g_ma_holder.bonus.flags & SCRIBBLE)
 		memset(f->found->data, g_ma_holder.bonus.scribble, f->found->size);
+	return (0);
 }
 
-MA_PUBLIC void	free(void *ptr)
+void	free(void *ptr)
 {
 	t_ma_found_link	f;
 	char			buff[65];

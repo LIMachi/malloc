@@ -6,14 +6,14 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/23 05:56:52 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:47:21 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:51:43 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <malloc_internal.h>
 
-MA_PRIVATE t_ma_link	*ma_next_block(t_ma_head *h, int type, t_ma_link *l,
-										int *error)
+t_ma_link	*ma_next_block(t_ma_head *h, int type, t_ma_link *l,
+						int *error)
 {
 	size_t	next_abs;
 	char	buff0[65];

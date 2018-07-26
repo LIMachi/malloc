@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/26 16:17:42 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 17:53:05 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:51:11 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ static inline size_t	sif_hexdump(void *data, size_t *size)
 	return (((size_t)data) & ~0xFull);
 }
 
-MA_PRIVATE void	hexdump(void *data, size_t size)
+void					hexdump(void *data, size_t size)
 {
 	char	buff[17];
 	size_t	mem_line;

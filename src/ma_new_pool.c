@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 23:12:33 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:47:17 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:53:31 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@
 ** create a new pool of the chosen type, prepare it and link it
 */
 
-MA_PRIVATE t_ma_head	*ma_new_pool(size_t size, int type)
+t_ma_head	*ma_new_pool(size_t size,
+		int type)
 {
 	t_ma_head	*out;
 
@@ -26,14 +27,14 @@ MA_PRIVATE t_ma_head	*ma_new_pool(size_t size, int type)
 	else
 	{
 		size = size + sizeof(t_ma_link) + sizeof(t_ma_head);
-		size = (size / g_ma_holder.page_size + !!(size % g_ma_holder.page_size)) *
-			g_ma_holder.page_size;
+		size = (size / g_ma_holder.page_size + !!(size % g_ma_holder.page_size))
+			* g_ma_holder.page_size;
 	}
 	if ((out = (t_ma_head*)mmap(0, size, PROT_READ | PROT_WRITE,
 			MAP_PRIVATE | MAP_ANON, -1, 0)) == MAP_FAILED)
 		return ((t_ma_head*)ma_error("ma_new_pool", 1,
-									"out of memory (mmap failure)"));
-	out->next = g_ma_holder.head[type];
+			"out of memory (mmap failure)"));
+		out->next = g_ma_holder.head[type];
 	out->prev = NULL;
 	if (out->next != NULL)
 		out->next->prev = out;

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 20:33:02 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 13:52:58 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:36:55 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	*calloc(size_t nmemb, size_t size)
 	pthread_mutex_unlock(&g_ma_mutex);
 	ma_debug_utoabuff(nmemb, buff0, 10, "0123456789");
 	ma_debug_utoabuff(size, buff1, 10, "0123456789");
-	ma_log("calloc", 4, "call to calloc with ", buff0 ,", ", buff1);
+	ma_log("calloc", 4, "call to calloc with ", buff0, ", ", buff1);
 	if (nmemb * size < size)
 	{
 		ma_error("calloc", 1, "invalid calloc total size");

@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 21:43:03 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 17:51:28 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:50:47 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <string.h>
 
-MA_PRIVATE t_ma_link	*ma_malloc(size_t size, int type)
+t_ma_link		*ma_malloc(size_t size, int type)
 {
 	t_ma_link	*l;
 
@@ -29,7 +29,7 @@ MA_PRIVATE t_ma_link	*ma_malloc(size_t size, int type)
 	return (l);
 }
 
-MA_PUBLIC void			*malloc(size_t size)
+void			*malloc(size_t size)
 {
 	int			type;
 	t_ma_link	*l;

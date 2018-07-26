@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/17 22:05:30 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 14:49:28 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:52:02 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,7 @@ static inline void	*sif_realloc1(t_ma_found_link *f, size_t size)
 		memcpy(tmp, f->found->data + g_ma_holder.bonus.guard_edges,
 				(f->found->size < size ? f->found->size : size)
 				- g_ma_holder.bonus.guard_edges * 2);
-		ma_free(f);
-		return (tmp + g_ma_holder.bonus.guard_edges);
+		return (tmp + g_ma_holder.bonus.guard_edges + (size_t)ma_free(f));
 	}
 	else if (f->found->size + f->after->size + sizeof(t_ma_link)
 			- size < sizeof(t_ma_link))
@@ -147,7 +146,7 @@ static inline int	sif_realloc2(void *p, size_t size, void **out)
 	return (0);
 }
 
-MA_PUBLIC void		*realloc(void *p, size_t s)
+void				*realloc(void *p, size_t s)
 {
 	t_ma_found_link	f;
 	void			*o;

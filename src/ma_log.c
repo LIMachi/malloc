@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/25 10:26:31 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:54:12 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:53:52 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@
 ** nb_arg precise the number of null terminated strings passed to ma_log
 */
 
-MA_PRIVATE size_t	ma_log(const char *function_name, size_t nb_arg, ...)
+size_t	ma_log(const char *function_name, size_t nb_arg,
+			...)
 {
 	va_list			va;
 	char			*str;
@@ -44,7 +45,8 @@ MA_PRIVATE size_t	ma_log(const char *function_name, size_t nb_arg, ...)
 	return (0);
 }
 
-MA_PRIVATE size_t	ma_error(const char *function_name, size_t nb_arg, ...)
+size_t	ma_error(const char *function_name, size_t nb_arg,
+			...)
 {
 	va_list			va;
 	char			*str;
@@ -64,6 +66,6 @@ MA_PRIVATE size_t	ma_error(const char *function_name, size_t nb_arg, ...)
 	}
 	write(g_ma_holder.bonus.log_fd, "\n", 1);
 	if (g_ma_holder.bonus.flags & EXIT_ON_ERROR)
-		exit (0);
+		exit(0);
 	return (0);
 }

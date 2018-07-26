@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 14:57:43 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/25 20:47:25 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:54:04 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static inline void	error(void *ptr)
 		" cannot be resolved in any pool");
 }
 
-MA_PRIVATE int		ma_validate_pointer(void *ptr, t_ma_found_link *f)
+int					ma_validate_pointer(void *ptr, t_ma_found_link *f)
 {
 	int	err;
 

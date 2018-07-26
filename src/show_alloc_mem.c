@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 20:24:37 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 16:26:08 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:52:15 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static inline void	print_pool(t_ma_head *h, int type)
 	write(1, "\n", 1);
 }
 
-MA_PUBLIC void	show_alloc_mem(void)
+void				show_alloc_mem(void)
 {
 	t_ma_head			*h;
 	t_ma_link			*l;

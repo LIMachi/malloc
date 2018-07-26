@@ -6,7 +6,7 @@
 /*   By: hmartzol <hmartzol@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/07/21 15:59:29 by hmartzol          #+#    #+#             */
-/*   Updated: 2018/07/26 14:16:36 by hmartzol         ###   ########.fr       */
+/*   Updated: 2018/07/26 18:52:08 by hmartzol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static inline int	reallocf1(void *ptr, size_t size, void **out)
 	return (0);
 }
 
-MA_PUBLIC void		*reallocf(void *ptr, size_t size)
+void				*reallocf(void *ptr, size_t size)
 {
 	void	*out;
 
